@@ -1,7 +1,6 @@
 #include <CApp.h>
 
 #include <chrono>
-#include <algorithm>
 #include <thread>
 
 #include <SDL_image.h>
@@ -23,19 +22,19 @@ int CApp::OnExecute()
 	{
 		return -1;
 	}
+	
 	SDL_Event event;
+	using clock = std::chrono::system_clock;
+	auto previousTime = clock::now();
 	
 	// game loop
-	auto previousTime = std::chrono::system_clock::now();
-	int lag_ms = 0;
 	while (mRunning)
 	{
-		// adjust time step
-		auto currentTime = std::chrono::system_clock::now();
-		int elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - previousTime).count();
-		previousTime = currentTime;
-		elapsed_ms = std::max(200, elapsed_ms);
-		lag_ms += elapsed_ms;
+		// adjust time step for this frame
+		auto startTime = clock::now();
+		int elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(startTime - previousTime).count();
+		previousTime = startTime;
+		elapsed_ms = std::min(200, elapsed_ms);
 		
 		// process inputs
 		while (SDL_PollEvent(&event))
@@ -43,13 +42,15 @@ int CApp::OnExecute()
 			OnEvent(&event);
 		}
 		
-		while (lag_ms >= MS_PER_UPDATE)
-		{
-			OnLoop(MS_PER_UPDATE / 1000.f);
-			lag_ms -= MS_PER_UPDATE;
-		}
+		OnLoop(elapsed_ms /1000.f);
+		
 		OnRender();
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		
+		// sleep for the rest of the frame
+		auto endTime = clock::now();
+		int frameTime_ms = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+		int sleep_ms = MS_PER_UPDATE - frameTime_ms;
+		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
 	}
 	
 	// destroy everything
@@ -119,6 +120,7 @@ void CApp::OnMButtonDown(int x, int y)
 
 void CApp::OnLoop(float delta_time)
 {
+	printf("This frame took %.3f seconds to run.\n", delta_time);
 }
 
 void CApp::OnRender()
