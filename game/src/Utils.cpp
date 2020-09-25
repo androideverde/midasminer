@@ -2,6 +2,11 @@
 
 SDL_Texture* Utils::LoadImage(const std::string& file_str, SDL_Renderer* renderer)
 {
+	if (file_str == "")
+	{
+		printf("Empty file name for image to load\n");
+		return nullptr;
+	}
 	const char* file = file_str.c_str();
 	SDL_Surface* surf = IMG_Load(file);
 	if (surf == nullptr)
