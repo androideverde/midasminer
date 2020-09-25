@@ -11,6 +11,7 @@ CApp::CApp()
 	, mWindow(nullptr)
 	, mRenderer(nullptr)
 	, mBackground(nullptr)
+	, mBoardState()
 {
 }
 
@@ -79,6 +80,7 @@ bool CApp::OnInit()
 	{
 		return false;
 	}
+	mBoardState.SetupBoard();
 	return true;
 }
 

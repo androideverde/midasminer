@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include <CEvent.h>
+#include <CBoardState.h>
 #include <string>
 
 class CApp : public CEvent
@@ -25,6 +26,7 @@ private:
 	SDL_Renderer* mRenderer;
 	SDL_Texture* mBackground;
 	const int MS_PER_UPDATE = 16; // run at 60 FPS
+	CBoardState mBoardState;
 
 	bool LoadResources();
 };
