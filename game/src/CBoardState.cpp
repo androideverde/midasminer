@@ -24,9 +24,14 @@ CBoardState::CBoardState()
 void CBoardState::SetupBoard()
 {
 	int index = 0;
-	for (int i : CBoardStateInternal::SampleBoard)
+	for (int value : CBoardStateInternal::SampleBoard)
 	{
-		mBoardState[index] = static_cast<TileType>(i);
+		mBoardState[index] = static_cast<TileType>(value);
 		index++;
 	}
+}
+
+void CBoardState::SetTile(int pos, TileType type)
+{
+	mBoardState[pos] = type;
 }
