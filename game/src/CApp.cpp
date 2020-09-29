@@ -11,7 +11,7 @@ CApp::CApp()
 	, mWindow(nullptr)
 	, mRenderer(nullptr)
 	, mBackground(nullptr)
-	, mBoardState()
+	, mBoard()
 {
 }
 
@@ -76,7 +76,6 @@ bool CApp::OnInit()
 	{
 		return false;
 	}
-	mBoardState.SetupBoard();
 	if (!LoadResources())
 	{
 		return false;
@@ -91,7 +90,7 @@ bool CApp::LoadResources()
 	{
 		return false;
 	}
-	mBoardState.LoadResources(mRenderer);
+	mBoard.LoadResources(mRenderer);
 	return true;
 }
 
@@ -130,7 +129,7 @@ void CApp::OnRender()
 {
 	SDL_RenderClear(mRenderer);
 	SDL_RenderCopy(mRenderer, mBackground, nullptr, nullptr);
-	mBoardState.Render(mRenderer);
+	mBoard.Render(mRenderer);
 	SDL_RenderPresent(mRenderer);
 }
 
