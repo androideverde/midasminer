@@ -40,15 +40,30 @@ CBoard::~CBoard()
 	}
 }
 
+void CBoard::Update(float delta_time, bool clicked, int mouseX, int mouseY)
+{
+	if (clicked)
+	{
+		int pos = GetBoardPos(mouseX, mouseY);
+		printf("Cell clicked: %d\n", pos);
+	}
+}
+
+const int CBoard::GetBoardPos(int x, int y) const
+{
+	int row = (y - ORIGIN_Y) / CELL_SIZE;
+	int col = (x - ORIGIN_X) / CELL_SIZE;
+	return col + row * 8;
+}
+
 void CBoard::Render(SDL_Renderer* renderer)
 {
 	SDL_Rect rect = {0, 0, 0, 0};
-	int cellSize = 43;
 
 	for (int row = 0; row < 8; row++)
 	{
-		int x = 330;
-		int y = 100 + row * cellSize;
+		int x = ORIGIN_X;
+		int y = ORIGIN_Y + row * CELL_SIZE;
 		int offset = row * 8;
 		for (int i = 0; i < 8; i++)
 		{
@@ -57,7 +72,7 @@ void CBoard::Render(SDL_Renderer* renderer)
 			rect.y = y;
 			SDL_QueryTexture(mTextures.find(tile)->second, nullptr, nullptr, &rect.w, &rect.h);
 			SDL_RenderCopy(renderer, mTextures.find(tile)->second, nullptr, &rect);
-			x += cellSize;
+			x += CELL_SIZE;
 		}
 	}
 }

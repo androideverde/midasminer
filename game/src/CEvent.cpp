@@ -34,6 +34,9 @@ void CEvent::OnEvent(SDL_Event *event)
 					break;
 			}
 			break;
+		case SDL_MOUSEBUTTONUP:
+			OnButtonUp(event->button.x, event->button.y);
+			break;
 		default:
 			break;
 	}
