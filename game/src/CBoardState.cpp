@@ -1,5 +1,18 @@
 #include <CBoardState.h>
 
+namespace CBoardStateInternal {
+	std::vector<int> SampleBoard = {
+		1, 2, 3, 4, 5, 1, 2, 3,
+		4, 5, 1, 2, 3, 4, 5, 1,
+		2, 3, 4, 5, 1, 2, 3, 4,
+		5, 1, 2, 3, 4, 5, 1, 2,
+		3, 4, 5, 1, 2, 3, 4, 5,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		4, 5, 1, 2, 3, 4, 5, 1,
+		2, 3, 4, 5, 1, 2, 3, 4
+	};
+}
+
 CBoardState::CBoardState()
 {
 	for (int i = 0; i < 64; i++)
@@ -10,36 +23,10 @@ CBoardState::CBoardState()
 
 void CBoardState::SetupBoard()
 {
-	for (int row = 1; row < 9; row++)
+	int index = 0;
+	for (int i : CBoardStateInternal::SampleBoard)
 	{
-		int offset = (row - 1) * 8;
-		if (row % 2 == 0)
-		{
-			for (int i = 0; i < 8; i++)
-			{
-				if (i % 2 == 0)
-				{
-					mBoardState[i + offset] = TileType::RED;
-				}
-				else
-				{
-					mBoardState[i + offset] = TileType::GREEN;
-				}
-			}
-		}
-		else
-		{
-			for (int i = 0; i < 8; i++)
-			{
-				if (i % 2 == 0)
-				{
-					mBoardState[i + offset] = TileType::YELLOW;
-				}
-				else
-				{
-					mBoardState[i + offset] = TileType::BLUE;
-				}
-			}
-		}
+		mBoardState[index] = static_cast<TileType>(i);
+		index++;
 	}
 }
