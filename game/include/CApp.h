@@ -23,9 +23,7 @@ public:
 	void OnCleanup();
 private:
 	bool mRunning;
-	bool mClicked;
-	int mMouseX;
-	int mMouseY;
+	int mCellClicked;
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
 	SDL_Texture* mBackground;

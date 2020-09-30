@@ -12,9 +12,7 @@ CApp::CApp()
 	, mRenderer(nullptr)
 	, mBackground(nullptr)
 	, mBoard()
-	, mClicked(false)
-	, mMouseX(0)
-	, mMouseY(0)
+	, mCellClicked(-1)
 {
 }
 
@@ -109,18 +107,11 @@ void CApp::OnExit()
 
 void CApp::OnMouseMove(int x, int y, int delta_x, int delta_y, bool l_button, bool r_button, bool m_button)
 {
-	if (mClicked)
-	{
-		mMouseX = x;
-		mMouseY = y;
-	}
 }
 
 void CApp::OnLButtonDown(int x, int y)
 {
-	mClicked = true;
-	mMouseX = x;
-	mMouseY = y;
+	mCellClicked = mBoard.GetBoardPos(x, y);
 }
 
 void CApp::OnRButtonDown(int x, int y)
@@ -133,14 +124,23 @@ void CApp::OnMButtonDown(int x, int y)
 
 void CApp::OnButtonUp(int x, int y)
 {
-	mClicked = false;
-	mMouseX = x;
-	mMouseY = y;
+	int endCell = mBoard.GetBoardPos(x, y);
+	if (!(mCellClicked < 0 || endCell < 0))
+	{
+		if (mCellClicked == endCell)
+		{
+			mBoard.OnClick(mCellClicked);
+		}
+		else
+		{
+			mBoard.OnDrag(mCellClicked, endCell);
+		}
+	}
 }
 
 void CApp::OnLoop(float delta_time)
 {
-	mBoard.Update(delta_time, mClicked, mMouseX, mMouseY);
+	mBoard.Update(delta_time);
 }
 
 void CApp::OnRender()

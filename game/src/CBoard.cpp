@@ -16,11 +16,10 @@ namespace CBoardInternal {
 
 void CBoard::LoadResources(SDL_Renderer* renderer)
 {
-	auto it = CBoardInternal::TextureFiles.begin();
-	while (it != CBoardInternal::TextureFiles.end())
+	assert(mTextures.empty());
+	for (const auto& it : CBoardInternal::TextureFiles)
 	{
-		mTextures.insert({it->first, Utils::LoadImage(it->second, renderer)});
-		it++;
+		mTextures.insert({it.first, Utils::LoadImage(it.second, renderer)});
 	}
 }
 
@@ -32,28 +31,36 @@ CBoard::CBoard()
 
 CBoard::~CBoard()
 {
-	auto it = mTextures.begin();
-	while (it != mTextures.end())
+	for (const auto& it : mTextures)
 	{
-		SDL_DestroyTexture(it->second);
-		it++;
+		SDL_DestroyTexture(it.second);
 	}
 }
 
-void CBoard::Update(float delta_time, bool clicked, int mouseX, int mouseY)
+void CBoard::OnClick(int pos)
 {
-	if (clicked)
-	{
-		int pos = GetBoardPos(mouseX, mouseY);
-		printf("Cell clicked: %d\n", pos);
-	}
+	printf("Clicked cell: %d\n", pos);
+}
+
+void CBoard::OnDrag(int start, int end)
+{
+	printf("Drag completed: from %d to %d\n", start, end);
+}
+
+void CBoard::Update(float delta_time)
+{
 }
 
 const int CBoard::GetBoardPos(int x, int y) const
 {
-	int row = (y - ORIGIN_Y) / CELL_SIZE;
-	int col = (x - ORIGIN_X) / CELL_SIZE;
-	return col + row * 8;
+	if (!(x < ORIGIN_X || x > ORIGIN_X + 8 * CELL_SIZE ||
+		  y < ORIGIN_Y || y > ORIGIN_Y + 8 * CELL_SIZE))
+	{
+		int row = (y - ORIGIN_Y) / CELL_SIZE;
+		int col = (x - ORIGIN_X) / CELL_SIZE;
+		return col + row * 8;
+	}
+	return -1;
 }
 
 void CBoard::Render(SDL_Renderer* renderer)
