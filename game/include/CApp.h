@@ -24,6 +24,7 @@ public:
 private:
 	bool mRunning;
 	int mCellClicked;
+	bool mDragging;
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
 	SDL_Texture* mBackground;
