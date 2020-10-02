@@ -21,9 +21,9 @@ public:
 private:
 	CBoardState mBoardState;
 	std::map<TileType, SDL_Texture*> mTextures;
-	const int CELL_SIZE = 43; // each board square is 43x43 pixels
+	const int TILE_SIZE = 43; // each board tile is 43x43 pixels
 	const int ORIGIN_X = 330; // board top left is at (330, 100) of the BackGround.jpg image
 	const int ORIGIN_Y = 100;
-	int mMatchCell1;
-	int mMatchCell2;
+	int mSwappedTile_1;
+	int mSwappedTile_2;
 };

@@ -23,7 +23,7 @@ public:
 	void OnCleanup();
 private:
 	bool mRunning;
-	int mCellClicked;
+	int mTileClicked;
 	bool mDragging;
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
