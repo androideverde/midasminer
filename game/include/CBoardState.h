@@ -8,7 +8,7 @@
 class CBoardState
 {
 public:
-	CBoardState();
+	CBoardState(int size);
 	void SetupBoard();
 	void SetTile(int pos, TileType type);
 	TileType GetTile(int pos) const { return mBoardState[pos]; }
@@ -16,4 +16,5 @@ public:
 	std::vector<int> GetColNeighboursSameAsTile(int pos) const;
 private:
 	std::vector<TileType> mBoardState;
+	const int BOARD_SIZE;
 };

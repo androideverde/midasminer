@@ -24,7 +24,7 @@ void CBoard::LoadResources(SDL_Renderer* renderer)
 }
 
 CBoard::CBoard()
-	: mBoardState()
+	: mBoardState(BOARD_SIZE)
 	, mSwappedTile_1(-1)
 	, mSwappedTile_2(-1)
 {
@@ -100,12 +100,12 @@ void CBoard::Update(float delta_time)
 
 int CBoard::GetBoardPos(int x, int y) const
 {
-	if (!(x < ORIGIN_X || x > ORIGIN_X + 8 * TILE_SIZE ||
-		  y < ORIGIN_Y || y > ORIGIN_Y + 8 * TILE_SIZE))
+	if (!(x < ORIGIN_X || x > ORIGIN_X + BOARD_SIZE * TILE_SIZE ||
+		  y < ORIGIN_Y || y > ORIGIN_Y + BOARD_SIZE * TILE_SIZE))
 	{
 		int row = (y - ORIGIN_Y) / TILE_SIZE;
 		int col = (x - ORIGIN_X) / TILE_SIZE;
-		return col + row * 8;
+		return col + row * BOARD_SIZE;
 	}
 	return -1;
 }
@@ -114,12 +114,12 @@ void CBoard::Render(SDL_Renderer* renderer)
 {
 	SDL_Rect rect = {0, 0, 0, 0};
 
-	for (int row = 0; row < 8; row++)
+	for (int row = 0; row < BOARD_SIZE; row++)
 	{
 		int x = ORIGIN_X;
 		int y = ORIGIN_Y + row * TILE_SIZE;
-		int offset = row * 8;
-		for (int i = 0; i < 8; i++)
+		int offset = row * BOARD_SIZE;
+		for (int i = 0; i < BOARD_SIZE; i++)
 		{
 			TileType tile = mBoardState.GetTile(i + offset);
 			rect.x = x;
