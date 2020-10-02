@@ -13,13 +13,17 @@ public:
 	void LoadResources(SDL_Renderer* renderer);
 	void Update(float delta_time);
 	void Render(SDL_Renderer* renderer);
-	const int GetBoardPos(int x, int y) const;
+	int GetBoardPos(int x, int y) const;
 	void OnClick(int pos);
 	void OnDrag(int start, int end);
+	bool DoSwap(int cell1, int cell2);
+	bool CheckForMatchesAtPos(int pos) const;
 private:
 	CBoardState mBoardState;
 	std::map<TileType, SDL_Texture*> mTextures;
 	const int CELL_SIZE = 43; // each board square is 43x43 pixels
 	const int ORIGIN_X = 330; // board top left is at (330, 100) of the BackGround.jpg image
 	const int ORIGIN_Y = 100;
+	int mMatchCell1;
+	int mMatchCell2;
 };

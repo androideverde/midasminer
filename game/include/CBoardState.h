@@ -11,7 +11,9 @@ public:
 	CBoardState();
 	void SetupBoard();
 	void SetTile(int pos, TileType type);
-	const TileType GetTile(int pos) const { return mBoardState[pos]; }
+	TileType GetTile(int pos) const { return mBoardState[pos]; }
+	std::vector<int> GetRowNeighboursSameAsTile(int pos) const;
+	std::vector<int> GetColNeighboursSameAsTile(int pos) const;
 private:
 	std::vector<TileType> mBoardState;
 };
