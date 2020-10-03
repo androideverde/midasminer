@@ -74,13 +74,13 @@ bool CBoard::DoSwap(int tile_1, int tile_2)
 bool CBoard::CheckForMatchesAtPos(int pos) const
 {
 	std::vector<int> matchInRow = mBoardState.GetRowNeighboursSameAsTile(pos);
-	if (matchInRow.size() >= 2)
+	if (matchInRow.size() >= 3)
 	{
 		printf("found match in row!\n");
 		return true;
 	}
 	std::vector<int> matchInCol = mBoardState.GetColNeighboursSameAsTile(pos);
-	if (matchInCol.size() >= 2)
+	if (matchInCol.size() >= 3)
 	{
 		printf("found match in col!\n");
 		return true;

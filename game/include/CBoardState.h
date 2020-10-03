@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ETileType.h>
+#include <SBoardCoords.h>
 #include <SDL.h>
 #include <vector>
 #include <map>
@@ -17,4 +18,7 @@ public:
 private:
 	std::vector<TileType> mBoardState;
 	const int BOARD_SIZE;
+	int GetIndexFromCoords(int row, int col) const;
+	SBoardCoords GetCoordsFromIndex(int index) const;
+	std::vector<int> GetNeighbours(int pos, bool orientation, bool direction) const;
 };

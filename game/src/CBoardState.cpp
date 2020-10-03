@@ -6,8 +6,8 @@ namespace CBoardStateInternal {
 		4, 5, 1, 2, 3, 4, 5, 1,
 		2, 3, 1, 5, 1, 2, 3, 4,
 		5, 1, 2, 3, 4, 5, 1, 2,
-		3, 4, 5, 1, 2, 3, 4, 5,
-		1, 2, 3, 4, 5, 1, 1, 3,
+		3, 4, 1, 1, 2, 3, 4, 5,
+		1, 2, 3, 4, 5, 1, 2, 3,
 		4, 5, 1, 2, 3, 4, 5, 1,
 		2, 3, 4, 5, 1, 2, 3, 4
 	};
@@ -37,83 +37,67 @@ void CBoardState::SetTile(int pos, TileType type)
 	mBoardState[pos] = type;
 }
 
-std::vector<int> CBoardState::GetRowNeighboursSameAsTile(int pos) const
+int CBoardState::GetIndexFromCoords(int row, int col) const
+{
+	return col + BOARD_SIZE * row;
+}
+
+SBoardCoords CBoardState::GetCoordsFromIndex(int index) const
+{
+	SBoardCoords coords;
+	coords.col = index % BOARD_SIZE;
+	coords.row = index / BOARD_SIZE;
+	return coords;
+}
+
+std::vector<int> CBoardState::GetNeighbours(int pos, bool orientation, bool direction) const
 {
 	std::vector<int> result;
 	TileType tile = mBoardState[pos];
-	int col = pos % BOARD_SIZE;
-	// LEFT
-	if (col > 0)
+	int row = GetCoordsFromIndex(pos).row;
+	int col = GetCoordsFromIndex(pos).col;
+	int loopOrientation;
+	orientation ? loopOrientation = col : loopOrientation = row; // true = HORIZONTAL, false = VERTICAL
+	int loopIndex;
+	direction ? loopIndex = loopOrientation : loopIndex = BOARD_SIZE - loopOrientation - 1; // true = TO_LOW, false = TO_HIGH
+	for (int i = 0; i < loopIndex; i++)
 	{
-		for (int index = pos - 1; index > pos - col; index--)
+		int nextStep;
+		direction ? nextStep = loopOrientation - 1 - i : nextStep = loopOrientation + 1 + i;
+		SBoardCoords neighbour;
+		orientation ? neighbour = {row, nextStep} : neighbour = {nextStep, col};
+		int index = GetIndexFromCoords(neighbour.row, neighbour.col);
+		TileType neighbourTile = mBoardState[index];
+		if (neighbourTile == tile)
 		{
-			TileType neighbour = mBoardState[index];
-			if (neighbour == tile)
-			{
-				result.push_back(index);
-			}
-			else
-			{
-				break;
-			}
+			result.push_back(index);
 		}
-	}
-	// RIGHT
-	if (col < BOARD_SIZE - 1)
-	{
-		for (int index = pos + 1; index < pos + BOARD_SIZE - col; index++)
+		else
 		{
-			TileType neighbour = mBoardState[index];
-			if (neighbour == tile)
-			{
-				result.push_back(index);
-			}
-			else
-			{
-				break;
-			}
+			break;
 		}
 	}
 	return result;
 }
 
+std::vector<int> CBoardState::GetRowNeighboursSameAsTile(int pos) const
+{
+	std::vector<int> left = GetNeighbours(pos, true, true);
+	std::vector<int> right = GetNeighbours(pos, true, false);
+	std::vector<int> result;
+	result.push_back(pos);
+	std::merge(left.begin(), left.end(), right.begin(), right.end(), std::back_inserter(result));
+	std::sort(result.begin(), result.end());
+	return result;
+}
+
 std::vector<int> CBoardState::GetColNeighboursSameAsTile(int pos) const
 {
+	std::vector<int> top = GetNeighbours(pos, false, true);
+	std::vector<int> bottom = GetNeighbours(pos, false, false);
 	std::vector<int> result;
-	TileType tile = mBoardState[pos];
-	int row = pos / BOARD_SIZE;
-	int col = pos % BOARD_SIZE;
-	// TOP
-	if (row > 0)
-	{
-		for (int index = pos - BOARD_SIZE; index > pos - row * BOARD_SIZE; index -= BOARD_SIZE)
-		{
-			TileType neighbour = mBoardState[index];
-			if (neighbour == tile)
-			{
-				result.push_back(index);
-			}
-			else
-			{
-				break;
-			}
-		}
-	}
-	// DOWN
-	if (row < BOARD_SIZE - 1)
-	{
-		for (int index = pos + BOARD_SIZE; index < pos + (BOARD_SIZE - row) * BOARD_SIZE; index += BOARD_SIZE)
-		{
-			TileType neighbour = mBoardState[index];
-			if (neighbour == tile)
-			{
-				result.push_back(index);
-			}
-			else
-			{
-				break;
-			}
-		}
-	}
+	result.push_back(pos);
+	std::merge(top.begin(), top.end(), bottom.begin(), bottom.end(), std::back_inserter(result));
+	std::sort(result.begin(), result.end());
 	return result;
 }
