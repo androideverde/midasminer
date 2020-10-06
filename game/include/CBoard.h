@@ -4,6 +4,7 @@
 #include <ETileType.h>
 #include <SBoardCoords.h>
 #include <SDL.h>
+#include <set>
 #include <map>
 
 class CBoard
@@ -18,7 +19,7 @@ public:
 	void OnClick(SBoardCoords coords);
 	void OnDrag(SBoardCoords startCoords, SBoardCoords endCoords);
 	bool DoSwap(int tile_1, int tile_2);
-	bool CheckForMatchesAtPos(int index) const;
+	std::set<int> GetMatchesForTile(int index) const;
 private:
 	std::map<TileType, SDL_Texture*> mTextures;
 	const int TILE_SIZE = 43; // each board tile is 43x43 pixels

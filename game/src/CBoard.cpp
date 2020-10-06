@@ -1,6 +1,7 @@
 #include <CBoard.h>
 
 #include <Utils.h>
+#include <set>
 
 namespace CBoardInternal {
 	std::map<TileType, const std::string> TextureFiles =
@@ -60,8 +61,8 @@ bool CBoard::DoSwap(int tile_1, int tile_2)
 	TileType oldTile_2 = mBoardState.GetTile(tile_2);
 	mBoardState.SetTile(tile_1, oldTile_2);
 	mBoardState.SetTile(tile_2, oldTile_1);
-	// check for matches at pos cell1
-	if (CheckForMatchesAtPos(tile_1) || CheckForMatchesAtPos(tile_2))
+	// check for matches at pos
+	if (!GetMatchesForTile(tile_1).empty() || !GetMatchesForTile(tile_2).empty())
 	{
 		printf("match found!\n");
 	}
@@ -73,21 +74,28 @@ bool CBoard::DoSwap(int tile_1, int tile_2)
 	}
 }
 
-bool CBoard::CheckForMatchesAtPos(int pos) const
+std::set<int> CBoard::GetMatchesForTile(int pos) const
 {
 	std::vector<int> matchInRow = mBoardState.GetRowNeighboursSameAsTile(pos);
+	std::vector<int> matchInCol = mBoardState.GetColNeighboursSameAsTile(pos);
+	std::set<int> matchGroup;
 	if (matchInRow.size() >= 3)
 	{
-		printf("found match in row!\n");
-		return true;
+		printf("row match!\n");
+		for (int item : matchInRow)
+		{
+			matchGroup.insert(item);
+		}
 	}
-	std::vector<int> matchInCol = mBoardState.GetColNeighboursSameAsTile(pos);
 	if (matchInCol.size() >= 3)
 	{
-		printf("found match in col!\n");
-		return true;
+		printf("col match!\n");
+		for (int item : matchInCol)
+		{
+			matchGroup.insert(item);
+		}
 	}
-	return false;
+	return matchGroup;
 }
 
 void CBoard::Update(float delta_time)
