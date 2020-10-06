@@ -50,22 +50,49 @@ SBoardCoords CBoardState::GetCoordsFromIndex(int index) const
 	return coords;
 }
 
-std::vector<int> CBoardState::GetNeighbours(int pos, bool orientation, bool direction) const
+std::vector<int> CBoardState::GetNeighbours(int pos, EDirection direction) const
 {
 	std::vector<int> result;
 	TileType tile = mBoardState[pos];
 	int row = GetCoordsFromIndex(pos).row;
 	int col = GetCoordsFromIndex(pos).col;
-	int loopOrientation;
-	orientation ? loopOrientation = col : loopOrientation = row; // true = HORIZONTAL, false = VERTICAL
 	int loopIndex;
-	direction ? loopIndex = loopOrientation : loopIndex = BOARD_SIZE - loopOrientation - 1; // true = TO_LOW, false = TO_HIGH
+	switch (direction) {
+		case CBoardState::EDirection::LEFT:
+			loopIndex = col;
+			break;
+		case CBoardState::EDirection::RIGHT:
+			loopIndex = BOARD_SIZE - col - 1;
+			break;
+		case CBoardState::EDirection::UP:
+			loopIndex = row;
+			break;
+		case CBoardState::EDirection::DOWN:
+			loopIndex = BOARD_SIZE - row - 1;
+			break;
+	}
 	for (int i = 0; i < loopIndex; i++)
 	{
 		int nextStep;
-		direction ? nextStep = loopOrientation - 1 - i : nextStep = loopOrientation + 1 + i;
 		SBoardCoords neighbour;
-		orientation ? neighbour = {row, nextStep} : neighbour = {nextStep, col};
+		switch (direction) {
+			case CBoardState::EDirection::LEFT:
+				nextStep = col - 1 - i;
+				neighbour = {row, nextStep};
+				break;
+			case CBoardState::EDirection::RIGHT:
+				nextStep = col + 1 + i;
+				neighbour = {row, nextStep};
+				break;
+			case CBoardState::EDirection::UP:
+				nextStep = row - 1 - i;
+				neighbour = {nextStep, col};
+				break;
+			case CBoardState::EDirection::DOWN:
+				nextStep = row + 1 + i;
+				neighbour = {nextStep, col};
+				break;
+		}
 		int index = GetIndexFromCoords(neighbour);
 		TileType neighbourTile = mBoardState[index];
 		if (neighbourTile == tile)
@@ -82,8 +109,8 @@ std::vector<int> CBoardState::GetNeighbours(int pos, bool orientation, bool dire
 
 std::vector<int> CBoardState::GetRowNeighboursSameAsTile(int pos) const
 {
-	std::vector<int> left = GetNeighbours(pos, true, true);
-	std::vector<int> right = GetNeighbours(pos, true, false);
+	std::vector<int> left = GetNeighbours(pos, CBoardState::EDirection::LEFT);
+	std::vector<int> right = GetNeighbours(pos, CBoardState::EDirection::RIGHT);
 	std::vector<int> result;
 	result.push_back(pos);
 	std::merge(left.begin(), left.end(), right.begin(), right.end(), std::back_inserter(result));
@@ -93,8 +120,8 @@ std::vector<int> CBoardState::GetRowNeighboursSameAsTile(int pos) const
 
 std::vector<int> CBoardState::GetColNeighboursSameAsTile(int pos) const
 {
-	std::vector<int> top = GetNeighbours(pos, false, true);
-	std::vector<int> bottom = GetNeighbours(pos, false, false);
+	std::vector<int> top = GetNeighbours(pos, CBoardState::EDirection::UP);
+	std::vector<int> bottom = GetNeighbours(pos, CBoardState::EDirection::DOWN);
 	std::vector<int> result;
 	result.push_back(pos);
 	std::merge(top.begin(), top.end(), bottom.begin(), bottom.end(), std::back_inserter(result));

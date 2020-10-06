@@ -19,6 +19,7 @@ public:
 private:
 	std::vector<TileType> mBoardState;
 	const int BOARD_SIZE;
+	enum class EDirection {LEFT, RIGHT, UP, DOWN};
 	SBoardCoords GetCoordsFromIndex(int index) const;
-	std::vector<int> GetNeighbours(int pos, bool orientation, bool direction) const;
+	std::vector<int> GetNeighbours(int pos, EDirection direction) const;
 };
