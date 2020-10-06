@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include <CEvent.h>
+#include <SBoardCoords.h>
 #include <CBoard.h>
 #include <string>
 
@@ -23,7 +24,7 @@ public:
 	void OnCleanup();
 private:
 	bool mRunning;
-	int mTileClicked;
+	SBoardCoords mTileClickedCoords;
 	bool mDragging;
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;

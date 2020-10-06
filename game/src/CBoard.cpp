@@ -39,13 +39,15 @@ CBoard::~CBoard()
 	}
 }
 
-void CBoard::OnClick(int pos)
+void CBoard::OnClick(SBoardCoords coords)
 {
-	printf("Clicked cell: %d\n", pos);
+	printf("Clicked tile: %d, %d\n", coords.row, coords.col);
 }
 
-void CBoard::OnDrag(int start, int end)
+void CBoard::OnDrag(SBoardCoords startCoords, SBoardCoords endCoords)
 {
+	int start = mBoardState.GetIndexFromCoords(startCoords);
+	int end = mBoardState.GetIndexFromCoords(endCoords);
 	printf("Drag completed: from %d to %d\n", start, end);
 	mSwappedTile_1 = start;
 	mSwappedTile_2 = end;
@@ -98,16 +100,17 @@ void CBoard::Update(float delta_time)
 	}
 }
 
-int CBoard::GetBoardPos(int x, int y) const
+SBoardCoords CBoard::GetBoardTileCoords(int x, int y) const
 {
 	if (!(x < ORIGIN_X || x > ORIGIN_X + BOARD_SIZE * TILE_SIZE ||
 		  y < ORIGIN_Y || y > ORIGIN_Y + BOARD_SIZE * TILE_SIZE))
 	{
-		int row = (y - ORIGIN_Y) / TILE_SIZE;
-		int col = (x - ORIGIN_X) / TILE_SIZE;
-		return col + row * BOARD_SIZE;
+		SBoardCoords tileCoords;
+		tileCoords.row = (y - ORIGIN_Y) / TILE_SIZE;
+		tileCoords.col = (x - ORIGIN_X) / TILE_SIZE;
+		return tileCoords;
 	}
-	return -1;
+	return {-1, -1};
 }
 
 void CBoard::Render(SDL_Renderer* renderer)

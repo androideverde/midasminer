@@ -37,9 +37,9 @@ void CBoardState::SetTile(int pos, TileType type)
 	mBoardState[pos] = type;
 }
 
-int CBoardState::GetIndexFromCoords(int row, int col) const
+int CBoardState::GetIndexFromCoords(SBoardCoords coords) const
 {
-	return col + BOARD_SIZE * row;
+	return coords.col + BOARD_SIZE * coords.row;
 }
 
 SBoardCoords CBoardState::GetCoordsFromIndex(int index) const
@@ -66,7 +66,7 @@ std::vector<int> CBoardState::GetNeighbours(int pos, bool orientation, bool dire
 		direction ? nextStep = loopOrientation - 1 - i : nextStep = loopOrientation + 1 + i;
 		SBoardCoords neighbour;
 		orientation ? neighbour = {row, nextStep} : neighbour = {nextStep, col};
-		int index = GetIndexFromCoords(neighbour.row, neighbour.col);
+		int index = GetIndexFromCoords(neighbour);
 		TileType neighbourTile = mBoardState[index];
 		if (neighbourTile == tile)
 		{

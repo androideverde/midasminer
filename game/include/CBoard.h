@@ -2,6 +2,7 @@
 
 #include <CBoardState.h>
 #include <ETileType.h>
+#include <SBoardCoords.h>
 #include <SDL.h>
 #include <map>
 
@@ -13,11 +14,11 @@ public:
 	void LoadResources(SDL_Renderer* renderer);
 	void Update(float delta_time);
 	void Render(SDL_Renderer* renderer);
-	int GetBoardPos(int x, int y) const;
-	void OnClick(int pos);
-	void OnDrag(int start, int end);
-	bool DoSwap(int cell1, int cell2);
-	bool CheckForMatchesAtPos(int pos) const;
+	SBoardCoords GetBoardTileCoords(int x, int y) const;
+	void OnClick(SBoardCoords coords);
+	void OnDrag(SBoardCoords startCoords, SBoardCoords endCoords);
+	bool DoSwap(int tile_1, int tile_2);
+	bool CheckForMatchesAtPos(int index) const;
 private:
 	std::map<TileType, SDL_Texture*> mTextures;
 	const int TILE_SIZE = 43; // each board tile is 43x43 pixels

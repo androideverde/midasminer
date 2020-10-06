@@ -15,10 +15,10 @@ public:
 	TileType GetTile(int pos) const { return mBoardState[pos]; }
 	std::vector<int> GetRowNeighboursSameAsTile(int pos) const;
 	std::vector<int> GetColNeighboursSameAsTile(int pos) const;
+	int GetIndexFromCoords(SBoardCoords coords) const;
 private:
 	std::vector<TileType> mBoardState;
 	const int BOARD_SIZE;
-	int GetIndexFromCoords(int row, int col) const;
 	SBoardCoords GetCoordsFromIndex(int index) const;
 	std::vector<int> GetNeighbours(int pos, bool orientation, bool direction) const;
 };

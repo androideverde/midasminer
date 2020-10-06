@@ -12,7 +12,7 @@ CApp::CApp()
 	, mRenderer(nullptr)
 	, mBackground(nullptr)
 	, mBoard()
-	, mTileClicked(-1)
+	, mTileClickedCoords({-1, -1})
 	, mDragging(false)
 {
 }
@@ -110,12 +110,12 @@ void CApp::OnMouseMove(int x, int y, int delta_x, int delta_y, bool l_button, bo
 {
 	if (mDragging)
 	{
-		int currentTile = mBoard.GetBoardPos(x, y);
-		if (mTileClicked != -1 && currentTile != -1)
+		SBoardCoords currentTileCoords = mBoard.GetBoardTileCoords(x, y);
+		if (mTileClickedCoords.row != -1 && currentTileCoords.row != -1)
 		{
-			if (mTileClicked != currentTile)
+			if (!(mTileClickedCoords == currentTileCoords))
 			{
-				mBoard.OnDrag(mTileClicked, currentTile);
+				mBoard.OnDrag(mTileClickedCoords, currentTileCoords);
 				mDragging = false;
 			}
 		}
@@ -124,8 +124,8 @@ void CApp::OnMouseMove(int x, int y, int delta_x, int delta_y, bool l_button, bo
 
 void CApp::OnLButtonDown(int x, int y)
 {
-	mTileClicked = mBoard.GetBoardPos(x, y);
-	if (mTileClicked != -1)
+	mTileClickedCoords = mBoard.GetBoardTileCoords(x, y);
+	if (mTileClickedCoords.row != -1)
 	{
 		mDragging = true;
 	}
@@ -143,12 +143,12 @@ void CApp::OnButtonUp(int x, int y)
 {
 	if (mDragging)
 	{
-		int currentCell = mBoard.GetBoardPos(x, y);
-		if (mTileClicked != -1 && currentCell != -1)
+		SBoardCoords currentTileCoords = mBoard.GetBoardTileCoords(x, y);
+		if (mTileClickedCoords.row != -1 && currentTileCoords.row != -1)
 		{
-			if (mTileClicked == currentCell)
+			if (mTileClickedCoords == currentTileCoords)
 			{
-				mBoard.OnClick(currentCell);
+				mBoard.OnClick(currentTileCoords);
 				mDragging = false;
 			}
 		}
