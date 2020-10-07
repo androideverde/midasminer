@@ -62,9 +62,23 @@ bool CBoard::DoSwap(int tile_1, int tile_2)
 	mBoardState.SetTile(tile_1, oldTile_2);
 	mBoardState.SetTile(tile_2, oldTile_1);
 	// check for matches at pos
-	if (!GetMatchesForTile(tile_1).empty() || !GetMatchesForTile(tile_2).empty())
+	std::set<int> matches_1 = GetMatchesForTile(tile_1);
+	std::set<int> matches_2 = GetMatchesForTile(tile_2);
+	if (!matches_1.empty())
 	{
 		printf("match found!\n");
+		for (int index : matches_1)
+		{
+			mBoardState.SetTile(index, TileType::EMPTY);
+		}
+	}
+	else if (!matches_2.empty())
+	{
+		printf("match found!\n");
+		for (int index : matches_2)
+		{
+			mBoardState.SetTile(index, TileType::EMPTY);
+		}
 	}
 	else
 	{
