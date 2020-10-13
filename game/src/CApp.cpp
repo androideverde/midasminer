@@ -12,7 +12,7 @@ CApp::CApp()
 	, mRenderer(nullptr)
 	, mBackground(nullptr)
 	, mBoard()
-	, mTileClickedCoords({-1, -1})
+	, mTileClickedCoords()
 	, mDragging(false)
 {
 }

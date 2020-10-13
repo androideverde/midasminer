@@ -26,8 +26,8 @@ void CBoard::LoadResources(SDL_Renderer* renderer)
 
 CBoard::CBoard()
 	: mBoardState(BOARD_SIZE)
-	, mSwappedTile_1(-1)
-	, mSwappedTile_2(-1)
+	, mSwappedTileCoords_1()
+	, mSwappedTileCoords_2()
 {
 	mBoardState.SetupBoard();
 }
@@ -42,83 +42,71 @@ CBoard::~CBoard()
 
 void CBoard::OnClick(SBoardCoords coords)
 {
-	printf("Clicked tile: %d, %d\n", coords.row, coords.col);
+	printf("Clicked tile: (%d,%d)\n", coords.row, coords.col);
 }
 
 void CBoard::OnDrag(SBoardCoords startCoords, SBoardCoords endCoords)
 {
-	int start = mBoardState.GetIndexFromCoords(startCoords);
-	int end = mBoardState.GetIndexFromCoords(endCoords);
-	printf("Drag completed: from %d to %d\n", start, end);
-	mSwappedTile_1 = start;
-	mSwappedTile_2 = end;
+	mSwappedTileCoords_1 = startCoords;
+	mSwappedTileCoords_2 = endCoords;
+	printf("Drag completed: from (%d,%d) to (%d,%d)\n", startCoords.row, startCoords.col, endCoords.row, endCoords.col);
 }
 
-bool CBoard::DoSwap(int tile_1, int tile_2)
+bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 {
 	// do swap
-	TileType oldTile_1 = mBoardState.GetTile(tile_1);
-	TileType oldTile_2 = mBoardState.GetTile(tile_2);
-	mBoardState.SetTile(tile_1, oldTile_2);
-	mBoardState.SetTile(tile_2, oldTile_1);
-	// check for matches at pos
-	std::set<int> matches_1 = GetMatchesForTile(tile_1);
-	std::set<int> matches_2 = GetMatchesForTile(tile_2);
-	if (!matches_1.empty())
+	TileType oldTile_1 = mBoardState.GetTile(tileCoords_1);
+	TileType oldTile_2 = mBoardState.GetTile(tileCoords_2);
+	mBoardState.SetTile(tileCoords_1, oldTile_2);
+	mBoardState.SetTile(tileCoords_2, oldTile_1);
+	// check for matches at each tile
+	if (isMatchInTile(tileCoords_1))
 	{
-		printf("match found!\n");
-		for (int index : matches_1)
+		std::set<SBoardCoords> matches = mBoardState.GetNeighboursSameAsTile(tileCoords_1);
+		for (SBoardCoords tileCoords : matches)
 		{
-			mBoardState.SetTile(index, TileType::EMPTY);
+			mBoardState.SetTile(tileCoords, TileType::EMPTY);
 		}
 	}
-	else if (!matches_2.empty())
+	else if (isMatchInTile(tileCoords_2))
 	{
-		printf("match found!\n");
-		for (int index : matches_2)
+		std::set<SBoardCoords> matches = mBoardState.GetNeighboursSameAsTile(tileCoords_2);
+		for (SBoardCoords tileCoords : matches)
 		{
-			mBoardState.SetTile(index, TileType::EMPTY);
+			mBoardState.SetTile(tileCoords, TileType::EMPTY);
 		}
 	}
 	else
 	{
 		// if not match, undo swap
-		mBoardState.SetTile(tile_1, oldTile_1);
-		mBoardState.SetTile(tile_2, oldTile_2);
+		mBoardState.SetTile(tileCoords_1, oldTile_1);
+		mBoardState.SetTile(tileCoords_2, oldTile_2);
 	}
 }
 
-std::set<int> CBoard::GetMatchesForTile(int pos) const
+bool CBoard::isMatchInTile(SBoardCoords coords) const
 {
-	std::vector<int> matchInRow = mBoardState.GetRowNeighboursSameAsTile(pos);
-	std::vector<int> matchInCol = mBoardState.GetColNeighboursSameAsTile(pos);
-	std::set<int> matchGroup;
-	if (matchInRow.size() >= 3)
+	if (mBoardState.CountRowNeighboursSameAsTile(coords) >= 3)
 	{
 		printf("row match!\n");
-		for (int item : matchInRow)
-		{
-			matchGroup.insert(item);
-		}
+		return true;
 	}
-	if (matchInCol.size() >= 3)
+	if (mBoardState.CountColNeighboursSameAsTile(coords) >= 3)
 	{
 		printf("col match!\n");
-		for (int item : matchInCol)
-		{
-			matchGroup.insert(item);
-		}
+		return true;
 	}
-	return matchGroup;
+	return false;
 }
 
 void CBoard::Update(float delta_time)
 {
 	// if there's a pending swap, do it
-	if (mSwappedTile_1 >= 0 && mSwappedTile_2 >= 0)
+	if (mSwappedTileCoords_1.row >= 0 && mSwappedTileCoords_2.row >= 0)
 	{
-		DoSwap(mSwappedTile_1, mSwappedTile_2);
-		mSwappedTile_1 = mSwappedTile_2 = -1;
+		DoSwap(mSwappedTileCoords_1, mSwappedTileCoords_2);
+		mSwappedTileCoords_1 = mSwappedTileCoords_2 = {-1, -1};
+		mBoardState.Refill();
 	}
 }
 
@@ -143,10 +131,9 @@ void CBoard::Render(SDL_Renderer* renderer)
 	{
 		int x = ORIGIN_X;
 		int y = ORIGIN_Y + row * TILE_SIZE;
-		int offset = row * BOARD_SIZE;
-		for (int i = 0; i < BOARD_SIZE; i++)
+		for (int col = 0; col < BOARD_SIZE; col++)
 		{
-			TileType tile = mBoardState.GetTile(i + offset);
+			TileType tile = mBoardState.GetTile({row, col});
 			rect.x = x;
 			rect.y = y;
 			SDL_QueryTexture(mTextures.find(tile)->second, nullptr, nullptr, &rect.w, &rect.h);

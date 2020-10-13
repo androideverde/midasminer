@@ -18,8 +18,8 @@ public:
 	SBoardCoords GetBoardTileCoords(int x, int y) const;
 	void OnClick(SBoardCoords coords);
 	void OnDrag(SBoardCoords startCoords, SBoardCoords endCoords);
-	bool DoSwap(int tile_1, int tile_2);
-	std::set<int> GetMatchesForTile(int index) const;
+	bool DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2);
+	bool isMatchInTile(SBoardCoords coords) const;
 private:
 	std::map<TileType, SDL_Texture*> mTextures;
 	const int TILE_SIZE = 43; // each board tile is 43x43 pixels
@@ -27,6 +27,6 @@ private:
 	const int ORIGIN_Y = 100;
 	const int BOARD_SIZE = 8; // board is 8x8 tiles
 	CBoardState mBoardState;
-	int mSwappedTile_1;
-	int mSwappedTile_2;
+	SBoardCoords mSwappedTileCoords_1;
+	SBoardCoords mSwappedTileCoords_2;
 };
