@@ -19,7 +19,9 @@ public:
 	void OnClick(SBoardCoords coords);
 	void OnDrag(SBoardCoords startCoords, SBoardCoords endCoords);
 	bool DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2);
-	bool isMatchInTile(SBoardCoords coords) const;
+	bool IsMatchInTile(SBoardCoords coords) const;
+	void DoMatchInTile(SBoardCoords coords);
+	void DoPendingMatches();
 private:
 	std::map<TileType, SDL_Texture*> mTextures;
 	const int TILE_SIZE = 43; // each board tile is 43x43 pixels

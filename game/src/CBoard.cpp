@@ -60,21 +60,13 @@ bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 	mBoardState.SetTile(tileCoords_1, oldTile_2);
 	mBoardState.SetTile(tileCoords_2, oldTile_1);
 	// check for matches at each tile
-	if (isMatchInTile(tileCoords_1))
+	if (IsMatchInTile(tileCoords_1))
 	{
-		std::set<SBoardCoords> matches = mBoardState.GetNeighboursSameAsTile(tileCoords_1);
-		for (SBoardCoords tileCoords : matches)
-		{
-			mBoardState.SetTile(tileCoords, TileType::EMPTY);
-		}
+		DoMatchInTile(tileCoords_1);
 	}
-	else if (isMatchInTile(tileCoords_2))
+	else if (IsMatchInTile(tileCoords_2))
 	{
-		std::set<SBoardCoords> matches = mBoardState.GetNeighboursSameAsTile(tileCoords_2);
-		for (SBoardCoords tileCoords : matches)
-		{
-			mBoardState.SetTile(tileCoords, TileType::EMPTY);
-		}
+		DoMatchInTile(tileCoords_2);
 	}
 	else
 	{
@@ -84,7 +76,16 @@ bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 	}
 }
 
-bool CBoard::isMatchInTile(SBoardCoords coords) const
+void CBoard::DoMatchInTile(SBoardCoords coords)
+{
+	std::set<SBoardCoords> matches = mBoardState.GetNeighboursSameAsTile(coords);
+	for (SBoardCoords tileCoords : matches)
+	{
+		mBoardState.SetTile(tileCoords, TileType::EMPTY);
+	}
+}
+
+bool CBoard::IsMatchInTile(SBoardCoords coords) const
 {
 	if (mBoardState.CountRowNeighboursSameAsTile(coords) >= 3)
 	{
@@ -101,12 +102,30 @@ bool CBoard::isMatchInTile(SBoardCoords coords) const
 
 void CBoard::Update(float delta_time)
 {
+	DoPendingMatches();
 	// if there's a pending swap, do it
 	if (mSwappedTileCoords_1.row >= 0 && mSwappedTileCoords_2.row >= 0)
 	{
 		DoSwap(mSwappedTileCoords_1, mSwappedTileCoords_2);
 		mSwappedTileCoords_1 = mSwappedTileCoords_2 = {-1, -1};
-		mBoardState.Refill();
+	}
+	mBoardState.Refill();
+}
+
+void CBoard::DoPendingMatches()
+{
+	SBoardCoords coords;
+	for (int row = 0; row < BOARD_SIZE; row++)
+	{
+		coords.row = row;
+		for (int col = 0; col < BOARD_SIZE; col++)
+		{
+			coords.col = col;
+			if (IsMatchInTile(coords))
+			{
+				DoMatchInTile(coords);
+			}
+		}
 	}
 }
 

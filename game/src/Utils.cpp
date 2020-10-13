@@ -1,5 +1,7 @@
 #include <Utils.h>
 
+#include <random>
+
 SDL_Texture* Utils::LoadImage(const std::string& file_str, SDL_Renderer* renderer)
 {
 	if (file_str == "")
@@ -18,4 +20,13 @@ SDL_Texture* Utils::LoadImage(const std::string& file_str, SDL_Renderer* rendere
 	SDL_FreeSurface(surf);
 	surf = nullptr;
 	return tex;
+}
+
+int Utils::GetRandomIntFromVector(const std::vector<int> list)
+{
+	std::random_device rd;
+	std::default_random_engine generator(rd());
+	std::uniform_int_distribution<int> distribution(0, static_cast<int>(list.size()) - 1);
+	int randomPick = distribution(generator);
+	return list[randomPick];
 }

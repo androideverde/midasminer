@@ -1,5 +1,7 @@
 #include <CBoardState.h>
 
+#include <Utils.h>
+
 namespace CBoardStateInternal {
 	std::vector<int> SampleBoard = {
 		1, 2, 3, 4, 5, 1, 2, 3,
@@ -198,5 +200,12 @@ void CBoardState::ShiftColumnDown(SBoardCoords coords)
 
 void CBoardState::AddNewCandy(SBoardCoords coords)
 {
-	SetTile(coords, TileType::RED);
+	std::vector<int> tileTypes;
+	tileTypes.push_back(static_cast<int>(TileType::BLUE));
+	tileTypes.push_back(static_cast<int>(TileType::GREEN));
+	tileTypes.push_back(static_cast<int>(TileType::RED));
+	tileTypes.push_back(static_cast<int>(TileType::YELLOW));
+	tileTypes.push_back(static_cast<int>(TileType::PURPLE));
+	TileType newTile = static_cast<TileType>(Utils::GetRandomIntFromVector(tileTypes));
+	SetTile(coords, newTile);
 }
