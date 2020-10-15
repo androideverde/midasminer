@@ -174,7 +174,7 @@ void CBoardState::Refill()
 			TileType tile = GetTile({row, col});
 			if (tile == TileType::EMPTY)
 			{
-				printf("found empty tile\n");
+				printf("found empty tile (%d, %d)\n", row, col);
 				ShiftColumnDown({row, col});
 				AddNewCandy({0, col});
 			}
@@ -187,11 +187,11 @@ void CBoardState::ShiftColumnDown(SBoardCoords coords)
 	for (int i = 0; i < coords.row; i++)
 	{
 		SBoardCoords current;
-		current.row = coords.row - i;
-		current.col = coords.col;
 		SBoardCoords above;
+		current.row = coords.row - i;
 		above.row = coords.row - 1 - i;
-		above.col = coords.col;
+		current.col = above.col = coords.col;
+		
 		TileType tile = GetTile(above);
 		SetTile(current, tile);
 		SetTile(above, TileType::EMPTY);
@@ -208,4 +208,30 @@ void CBoardState::AddNewCandy(SBoardCoords coords)
 	tileTypes.push_back(static_cast<int>(TileType::PURPLE));
 	TileType newTile = static_cast<TileType>(Utils::GetRandomIntFromVector(tileTypes));
 	SetTile(coords, newTile);
+	std::string tileName = GetTileName(newTile);
+	printf("refilled (%d, %d) with %s\n", coords.row, coords.col, tileName.c_str());
+}
+
+std::string CBoardState::GetTileName(TileType tile) const
+{
+	switch (tile) {
+		case TileType::BLUE:
+			return "BLUE";
+			break;
+		case TileType::GREEN:
+			return "GREEN";
+			break;
+		case TileType::RED:
+			return "RED";
+			break;
+		case TileType::YELLOW:
+			return "YELLOW";
+			break;
+		case TileType::PURPLE:
+			return "PURPLE";
+			break;
+		case TileType::EMPTY:
+			return "EMPTY";
+			break;
+	}
 }

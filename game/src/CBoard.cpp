@@ -89,12 +89,12 @@ bool CBoard::IsMatchInTile(SBoardCoords coords) const
 {
 	if (mBoardState.CountRowNeighboursSameAsTile(coords) >= 3)
 	{
-		printf("row match!\n");
+		printf("row match of %s in (%d, %d)!\n", mBoardState.GetTileName(mBoardState.GetTile(coords)).c_str(), coords.row, coords.col);
 		return true;
 	}
 	if (mBoardState.CountColNeighboursSameAsTile(coords) >= 3)
 	{
-		printf("col match!\n");
+		printf("col match of %s in (%d, %d)!\n", mBoardState.GetTileName(mBoardState.GetTile(coords)).c_str(), coords.row, coords.col);
 		return true;
 	}
 	return false;
@@ -121,6 +121,10 @@ void CBoard::DoPendingMatches()
 		for (int col = 0; col < BOARD_SIZE; col++)
 		{
 			coords.col = col;
+			if (mBoardState.GetTile(coords) == TileType::EMPTY)
+			{
+				continue;
+			}
 			if (IsMatchInTile(coords))
 			{
 				DoMatchInTile(coords);

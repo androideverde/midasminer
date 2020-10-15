@@ -18,6 +18,7 @@ public:
 	int CountColNeighboursSameAsTile(SBoardCoords coords) const;
 	std::set<SBoardCoords> GetNeighboursSameAsTile(SBoardCoords coords) const;
 	void Refill();
+	std::string GetTileName(TileType tile) const;
 private:
 	std::vector<TileType> mBoardState;
 	const int BOARD_SIZE;
