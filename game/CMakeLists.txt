@@ -32,3 +32,14 @@ add_custom_command(
  DEPENDS ${destination}
  COMMENT "symbolic link resources folder from ${source} => ${destination}"
 )
+
+# add executable for tests
+add_executable(${PROJECT_NAME}_tests)
+add_subdirectory(dependencies/googletest-1.10.x)
+target_link_libraries(${PROJECT_NAME}_tests PUBLIC gtest)
+target_link_libraries(${PROJECT_NAME}_tests PUBLIC /Library/Frameworks/SDL2.framework/SDL2)
+target_link_libraries(${PROJECT_NAME}_tests PUBLIC /Library/Frameworks/SDL2_image.framework/SDL2_image)
+# remove src/main.cpp from list of sources to compile in the tests target
+list(REMOVE_ITEM project_files /Users/Jordi.Bernabeu/personal/c++/midasminer/game/src/main.cpp)
+# add sources including code and tests
+target_sources(${PROJECT_NAME}_tests PRIVATE ${project_files} tests/main.cpp)
