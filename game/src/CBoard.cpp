@@ -30,7 +30,6 @@ CBoard::CBoard()
 	, mSwappedTileCoords_1()
 	, mSwappedTileCoords_2()
 {
-	mBoardState.SetupBoard();
 }
 
 CBoard::~CBoard()

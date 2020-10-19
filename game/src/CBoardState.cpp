@@ -23,12 +23,13 @@ CBoardState::CBoardState(int size)
 	{
 		mBoardState.push_back(TileType::EMPTY);
 	}
+	SetupBoard(CBoardStateInternal::SampleBoard);
 }
 
-void CBoardState::SetupBoard()
+void CBoardState::SetupBoard(const std::vector<int> boardDefinition)
 {
 	int index = 0;
-	for (int value : CBoardStateInternal::SampleBoard)
+	for (int value : boardDefinition)
 	{
 		mBoardState[index] = static_cast<TileType>(value);
 		index++;

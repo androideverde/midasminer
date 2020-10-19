@@ -12,7 +12,7 @@ class CBoardState
 {
 public:
 	CBoardState(int size);
-	void SetupBoard();
+	void SetupBoard(std::vector<int> boardDefinition);
 	void SetTile(SBoardCoords coords, TileType type);
 	TileType GetTile(SBoardCoords coords) const;
 	int CountRowNeighboursSameAsTile(SBoardCoords coords) const;
