@@ -3,7 +3,8 @@
 #include <SBoardCoords.h>
 #include <CBoardState.h>
 
-class CMatcher {
+class CMatcher
+{
 public:
 	CMatcher(CBoardState& state);
 	bool IsMatchInTile(SBoardCoords coords);

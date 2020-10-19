@@ -1,6 +1,7 @@
 #include <CBoardState.h>
 
 #include <Utils.h>
+#include <CCandyGenerator.h>
 
 namespace CBoardStateInternal {
 	std::vector<int> SampleBoard = {
@@ -200,13 +201,8 @@ void CBoardState::ShiftColumnDown(SBoardCoords coords)
 
 void CBoardState::AddNewCandy(SBoardCoords coords)
 {
-	std::vector<int> tileTypes;
-	tileTypes.push_back(static_cast<int>(TileType::BLUE));
-	tileTypes.push_back(static_cast<int>(TileType::GREEN));
-	tileTypes.push_back(static_cast<int>(TileType::RED));
-	tileTypes.push_back(static_cast<int>(TileType::YELLOW));
-	tileTypes.push_back(static_cast<int>(TileType::PURPLE));
-	TileType newTile = static_cast<TileType>(Utils::GetRandomIntFromVector(tileTypes));
+	CCandyGenerator generator = CCandyGenerator();
+	TileType newTile = generator.GenerateCandy();
 	SetTile(coords, newTile);
 	std::string tileName = GetTileName(newTile);
 	printf("refilled (%d, %d) with %s\n", coords.row, coords.col, tileName.c_str());
