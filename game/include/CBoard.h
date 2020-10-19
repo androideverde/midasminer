@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CBoardState.h>
+#include <CMatcher.h>
 #include <ETileType.h>
 #include <SBoardCoords.h>
 #include <SDL.h>
@@ -29,6 +30,7 @@ private:
 	const int ORIGIN_Y = 100;
 	const int BOARD_SIZE = 8; // board is 8x8 tiles
 	CBoardState mBoardState;
+	CMatcher mMatcher;
 	SBoardCoords mSwappedTileCoords_1;
 	SBoardCoords mSwappedTileCoords_2;
 };

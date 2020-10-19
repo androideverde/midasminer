@@ -4,6 +4,7 @@
 #include <SBoardCoords.h>
 #include <SDL.h>
 #include <vector>
+#include <string>
 #include <set>
 #include <map>
 

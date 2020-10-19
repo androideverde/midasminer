@@ -26,6 +26,7 @@ void CBoard::LoadResources(SDL_Renderer* renderer)
 
 CBoard::CBoard()
 	: mBoardState(BOARD_SIZE)
+	, mMatcher(mBoardState)
 	, mSwappedTileCoords_1()
 	, mSwappedTileCoords_2()
 {
@@ -60,13 +61,13 @@ bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 	mBoardState.SetTile(tileCoords_1, oldTile_2);
 	mBoardState.SetTile(tileCoords_2, oldTile_1);
 	// check for matches at each tile
-	if (IsMatchInTile(tileCoords_1))
+	if (mMatcher.IsMatchInTile(tileCoords_1))
 	{
-		DoMatchInTile(tileCoords_1);
+		mMatcher.DoMatchInTile(tileCoords_1);
 	}
-	else if (IsMatchInTile(tileCoords_2))
+	else if (mMatcher.IsMatchInTile(tileCoords_2))
 	{
-		DoMatchInTile(tileCoords_2);
+		mMatcher.DoMatchInTile(tileCoords_2);
 	}
 	else
 	{
@@ -74,30 +75,6 @@ bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 		mBoardState.SetTile(tileCoords_1, oldTile_1);
 		mBoardState.SetTile(tileCoords_2, oldTile_2);
 	}
-}
-
-void CBoard::DoMatchInTile(SBoardCoords coords)
-{
-	std::set<SBoardCoords> matches = mBoardState.GetNeighboursSameAsTile(coords);
-	for (SBoardCoords tileCoords : matches)
-	{
-		mBoardState.SetTile(tileCoords, TileType::EMPTY);
-	}
-}
-
-bool CBoard::IsMatchInTile(SBoardCoords coords) const
-{
-	if (mBoardState.CountRowNeighboursSameAsTile(coords) >= 3)
-	{
-		printf("row match of %s in (%d, %d)!\n", mBoardState.GetTileName(mBoardState.GetTile(coords)).c_str(), coords.row, coords.col);
-		return true;
-	}
-	if (mBoardState.CountColNeighboursSameAsTile(coords) >= 3)
-	{
-		printf("col match of %s in (%d, %d)!\n", mBoardState.GetTileName(mBoardState.GetTile(coords)).c_str(), coords.row, coords.col);
-		return true;
-	}
-	return false;
 }
 
 void CBoard::Update(float delta_time)
@@ -125,9 +102,9 @@ void CBoard::DoPendingMatches()
 			{
 				continue;
 			}
-			if (IsMatchInTile(coords))
+			if (mMatcher.IsMatchInTile(coords))
 			{
-				DoMatchInTile(coords);
+				mMatcher.DoMatchInTile(coords);
 			}
 		}
 	}
