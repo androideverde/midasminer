@@ -5,5 +5,5 @@
 class CCandyGenerator
 {
 public:
-	TileType GenerateCandy();
+	virtual TileType GenerateCandy() const;
 };

@@ -16,8 +16,9 @@ namespace CBoardStateInternal {
 	};
 }
 
-CBoardState::CBoardState(int size)
+CBoardState::CBoardState(int size, std::unique_ptr<const CCandyGenerator> candyGenerator)
 	: BOARD_SIZE(size)
+	, mCandyGenerator(std::move(candyGenerator))
 {
 	for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
 	{
@@ -26,7 +27,7 @@ CBoardState::CBoardState(int size)
 	SetupBoard(CBoardStateInternal::SampleBoard);
 }
 
-void CBoardState::SetupBoard(const std::vector<int> boardDefinition)
+void CBoardState::SetupBoard(const std::vector<int>& boardDefinition)
 {
 	int index = 0;
 	for (int value : boardDefinition)
@@ -202,8 +203,7 @@ void CBoardState::ShiftColumnDown(SBoardCoords coords)
 
 void CBoardState::AddNewCandy(SBoardCoords coords)
 {
-	CCandyGenerator generator = CCandyGenerator();
-	TileType newTile = generator.GenerateCandy();
+	TileType newTile = mCandyGenerator->GenerateCandy();
 	SetTile(coords, newTile);
 	std::string tileName = GetTileName(newTile);
 	printf("refilled (%d, %d) with %s\n", coords.row, coords.col, tileName.c_str());

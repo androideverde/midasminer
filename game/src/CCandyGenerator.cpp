@@ -3,7 +3,7 @@
 #include <Utils.h>
 #include <vector>
 
-TileType CCandyGenerator::GenerateCandy()
+TileType CCandyGenerator::GenerateCandy() const
 {
 	std::vector<int> tileTypes;
 	tileTypes.push_back(static_cast<int>(TileType::BLUE));

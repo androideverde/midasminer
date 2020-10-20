@@ -2,6 +2,7 @@
 
 #include <ETileType.h>
 #include <SBoardCoords.h>
+#include <CCandyGenerator.h>
 #include <SDL.h>
 #include <vector>
 #include <string>
@@ -11,8 +12,8 @@
 class CBoardState
 {
 public:
-	CBoardState(int size);
-	void SetupBoard(std::vector<int> boardDefinition);
+	CBoardState(int size, std::unique_ptr<const CCandyGenerator> candyGenerator);
+	void SetupBoard(const std::vector<int>& boardDefinition);
 	void SetTile(SBoardCoords coords, TileType type);
 	TileType GetTile(SBoardCoords coords) const;
 	int CountRowNeighboursSameAsTile(SBoardCoords coords) const;
@@ -23,6 +24,7 @@ public:
 private:
 	std::vector<TileType> mBoardState;
 	const int BOARD_SIZE;
+	std::unique_ptr<const CCandyGenerator> mCandyGenerator;
 	enum class EDirection {LEFT, RIGHT, UP, DOWN};
 	SBoardCoords GetCoordsFromIndex(int index) const;
 	int GetIndexFromCoords(SBoardCoords coords) const;

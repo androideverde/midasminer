@@ -25,7 +25,7 @@ void CBoard::LoadResources(SDL_Renderer* renderer)
 }
 
 CBoard::CBoard()
-	: mBoardState(BOARD_SIZE)
+	: mBoardState(BOARD_SIZE, std::make_unique<const CCandyGenerator>())
 	, mMatcher(mBoardState)
 	, mSwappedTileCoords_1()
 	, mSwappedTileCoords_2()
