@@ -16,15 +16,26 @@ namespace CBoardStateInternal {
 	};
 }
 
-CBoardState::CBoardState(int size, std::unique_ptr<const CCandyGenerator> candyGenerator)
+CBoardState::CBoardState(int size, int tile_size, std::unique_ptr<const CCandyGenerator> candyGenerator)
 	: BOARD_SIZE(size)
+	, TILE_SIZE(tile_size)
 	, mCandyGenerator(std::move(candyGenerator))
 {
 	for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
 	{
-		mBoardState.push_back(TileType::EMPTY);
+		SDL_Point candyPos = ResetCandyPos(i);
+		mCandies.push_back(std::make_unique<CCandy>(TileType::EMPTY, candyPos));
 	}
 	SetupBoard(CBoardStateInternal::SampleBoard);
+}
+
+SDL_Point CBoardState::ResetCandyPos(int index)
+{
+	SDL_Point point;
+	SBoardCoords coords = GetCoordsFromIndex(index);
+	point.x = coords.col * TILE_SIZE;
+	point.y = coords.row * TILE_SIZE;
+	return point;
 }
 
 void CBoardState::SetupBoard(const std::vector<int>& boardDefinition)
@@ -32,7 +43,7 @@ void CBoardState::SetupBoard(const std::vector<int>& boardDefinition)
 	int index = 0;
 	for (int value : boardDefinition)
 	{
-		mBoardState[index] = static_cast<TileType>(value);
+		mCandies[index]->SetType(static_cast<TileType>(value));
 		index++;
 	}
 }
@@ -40,13 +51,19 @@ void CBoardState::SetupBoard(const std::vector<int>& boardDefinition)
 TileType CBoardState::GetTile(SBoardCoords coords) const
 {
 	int index = GetIndexFromCoords(coords);
-	return mBoardState[index];
+	return mCandies[index]->GetType();
+}
+
+CCandy* CBoardState::GetCandy(SBoardCoords coords)
+{
+	int index = GetIndexFromCoords(coords);
+	return mCandies[index].get();
 }
 
 void CBoardState::SetTile(SBoardCoords coords, TileType type)
 {
 	int index = GetIndexFromCoords(coords);
-	mBoardState[index] = type;
+	mCandies[index]->SetType(type);
 }
 
 int CBoardState::GetIndexFromCoords(SBoardCoords coords) const

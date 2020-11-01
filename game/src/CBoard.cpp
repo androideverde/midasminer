@@ -3,6 +3,9 @@
 #include <Utils.h>
 #include <set>
 
+#include <vector>
+#include <CCandy.h>
+
 namespace CBoardInternal {
 	std::map<TileType, const std::string> TextureFiles =
 	{
@@ -25,7 +28,7 @@ void CBoard::LoadResources(SDL_Renderer* renderer)
 }
 
 CBoard::CBoard()
-	: mBoardState(BOARD_SIZE, std::make_unique<const CCandyGenerator>())
+	: mBoardState(BOARD_SIZE, TILE_SIZE, std::make_unique<const CCandyGenerator>())
 	, mMatcher(mBoardState)
 	, mSwappedTileCoords_1()
 	, mSwappedTileCoords_2()
