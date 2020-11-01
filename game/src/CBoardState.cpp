@@ -207,8 +207,8 @@ void CBoardState::Swap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 	int index_1 = GetIndexFromCoords(tileCoords_1);
 	int index_2 = GetIndexFromCoords(tileCoords_2);
 	std::swap(mCandies[index_1], mCandies[index_2]);
-	ResetCandyPos(index_1);
-	ResetCandyPos(index_2);
+	mCandies[index_1]->SetPos(ResetCandyPos(index_1));
+	mCandies[index_2]->SetPos(ResetCandyPos(index_2));
 }
 
 void CBoardState::ShiftColumnDown(SBoardCoords coords)

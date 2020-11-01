@@ -127,16 +127,14 @@ void CBoard::Render(SDL_Renderer* renderer)
 
 	for (int row = 0; row < BOARD_SIZE; row++)
 	{
-		int x = ORIGIN_X;
-		int y = ORIGIN_Y + row * TILE_SIZE;
 		for (int col = 0; col < BOARD_SIZE; col++)
 		{
-			TileType tile = mBoardState.GetTile({row, col});
-			rect.x = x;
-			rect.y = y;
+			CCandy* candy = mBoardState.GetCandy({row, col});
+			rect.x = ORIGIN_X + candy->GetX();
+			rect.y = ORIGIN_Y + candy->GetY();
+			TileType tile = candy->GetType();
 			SDL_QueryTexture(mTextures.find(tile)->second, nullptr, nullptr, &rect.w, &rect.h);
 			SDL_RenderCopy(renderer, mTextures.find(tile)->second, nullptr, &rect);
-			x += TILE_SIZE;
 		}
 	}
 }
