@@ -22,6 +22,7 @@ public:
 	int CountColNeighboursSameAsTile(SBoardCoords coords) const;
 	std::set<SBoardCoords> GetNeighboursSameAsTile(SBoardCoords coords) const;
 	void Refill();
+	void Swap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2);
 	std::string GetTileName(TileType tile) const;
 private:
 	std::vector<std::unique_ptr<CCandy>> mCandies;

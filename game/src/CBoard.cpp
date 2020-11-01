@@ -58,10 +58,7 @@ void CBoard::OnDrag(SBoardCoords startCoords, SBoardCoords endCoords)
 bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 {
 	// do swap
-	TileType oldTile_1 = mBoardState.GetTile(tileCoords_1);
-	TileType oldTile_2 = mBoardState.GetTile(tileCoords_2);
-	mBoardState.SetTile(tileCoords_1, oldTile_2);
-	mBoardState.SetTile(tileCoords_2, oldTile_1);
+	mBoardState.Swap(tileCoords_1, tileCoords_2);
 	// check for matches at each tile
 	if (mMatcher.IsMatchInTile(tileCoords_1))
 	{
@@ -74,8 +71,7 @@ bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 	else
 	{
 		// if not match, undo swap
-		mBoardState.SetTile(tileCoords_1, oldTile_1);
-		mBoardState.SetTile(tileCoords_2, oldTile_2);
+		mBoardState.Swap(tileCoords_2, tileCoords_1);
 	}
 }
 

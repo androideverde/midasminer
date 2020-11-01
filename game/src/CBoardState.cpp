@@ -202,6 +202,15 @@ void CBoardState::Refill()
 	}
 }
 
+void CBoardState::Swap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
+{
+	int index_1 = GetIndexFromCoords(tileCoords_1);
+	int index_2 = GetIndexFromCoords(tileCoords_2);
+	std::swap(mCandies[index_1], mCandies[index_2]);
+	ResetCandyPos(index_1);
+	ResetCandyPos(index_2);
+}
+
 void CBoardState::ShiftColumnDown(SBoardCoords coords)
 {
 	for (int i = 0; i < coords.row; i++)
@@ -211,10 +220,7 @@ void CBoardState::ShiftColumnDown(SBoardCoords coords)
 		current.row = coords.row - i;
 		above.row = coords.row - 1 - i;
 		current.col = above.col = coords.col;
-		
-		TileType tile = GetTile(above);
-		SetTile(current, tile);
-		SetTile(above, TileType::EMPTY);
+		Swap(current, above);
 	}
 }
 

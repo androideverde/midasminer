@@ -29,7 +29,7 @@ TEST(board, check_refill)
 		1, 2, 3, 4, 5, 1, 2, 3,
 		1, 2, 3, 4, 5, 1, 2, 3,
 	};
-	CBoardState boardState(8, std::make_unique<const TestCandyGenerator>());
+	CBoardState boardState(8, 43, std::make_unique<const TestCandyGenerator>());
 	boardState.SetupBoard(testBoard);
 	boardState.Refill();
 	EXPECT_EQ(boardState.GetTile({0, 1}), TileType::BLUE);
