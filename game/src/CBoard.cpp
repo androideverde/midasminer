@@ -33,6 +33,7 @@ CBoard::CBoard()
 	, mSwappedTileCoords_1()
 	, mSwappedTileCoords_2()
 {
+	mAnimationQueue.clear();
 }
 
 CBoard::~CBoard()
@@ -58,6 +59,8 @@ void CBoard::OnDrag(SBoardCoords startCoords, SBoardCoords endCoords)
 bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 {
 	// do swap
+	AddAnimation(AnimationType::MOVE, tileCoords_1, tileCoords_2, .4f, mBoardState.GetCandy(tileCoords_1));
+	AddAnimation(AnimationType::MOVE, tileCoords_2, tileCoords_1, .4f, mBoardState.GetCandy(tileCoords_2));
 	mBoardState.Swap(tileCoords_1, tileCoords_2);
 	// check for matches at each tile
 	if (mMatcher.IsMatchInTile(tileCoords_1))
@@ -71,20 +74,76 @@ bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 	else
 	{
 		// if not match, undo swap
+		AddAnimation(AnimationType::MOVE, tileCoords_1, tileCoords_2, .4f, mBoardState.GetCandy(tileCoords_1));
+		AddAnimation(AnimationType::MOVE, tileCoords_2, tileCoords_1, .4f, mBoardState.GetCandy(tileCoords_2));
 		mBoardState.Swap(tileCoords_2, tileCoords_1);
 	}
 }
 
+void CBoard::AddAnimation(AnimationType type, SBoardCoords coordsStart, SBoardCoords coordsEnd, float duration, CCandy* candy)
+{
+	SDL_Point startPoint = GetBoardTilePos(coordsStart);
+	SDL_Point endPoint = GetBoardTilePos(coordsEnd);
+	mAnimationQueue.push_back(CAnimation(type, startPoint, endPoint, duration, candy));
+}
+
 void CBoard::Update(float delta_time)
 {
-	DoPendingMatches();
-	// if there's a pending swap, do it
-	if (mSwappedTileCoords_1.row >= 0 && mSwappedTileCoords_2.row >= 0)
-	{
-		DoSwap(mSwappedTileCoords_1, mSwappedTileCoords_2);
-		mSwappedTileCoords_1 = mSwappedTileCoords_2 = {-1, -1};
+	if (mAnimationQueue.empty()) {
+		DoPendingMatches();
+		// if there's a pending swap, do it
+		if (mSwappedTileCoords_1.row >= 0 && mSwappedTileCoords_2.row >= 0)
+		{
+			DoSwap(mSwappedTileCoords_1, mSwappedTileCoords_2);
+			mSwappedTileCoords_1 = mSwappedTileCoords_2 = {-1, -1};
+		}
+		mBoardState.Refill();
 	}
-	mBoardState.Refill();
+	else
+	{
+		DoAnimation(delta_time);
+	}
+}
+
+void CBoard::DoAnimation(float delta_time)
+{
+	// take the first item in mAnimationQueue
+	CAnimation& anim = mAnimationQueue.at(0);
+	// perform the animation step for that, changing x,y values of the affected candy as needed for this frame
+	float timeStep;
+	int moveStepX;
+	int moveStepY;
+	SDL_Point pos;
+	bool completed = false;
+	float elapsed = 0.f;
+	switch (anim.GetType()) {
+		case AnimationType::MOVE:
+			elapsed = anim.GetElapsed();
+			timeStep = delta_time / (anim.GetDuration() - elapsed);
+			pos = anim.GetCandy()->GetPos();
+			moveStepX = (anim.GetEnd().x - ORIGIN_X - pos.x) * timeStep;
+			moveStepY = (anim.GetEnd().y - ORIGIN_Y - pos.y) * timeStep;
+			pos.x += moveStepX;
+			pos.y += moveStepY;
+			anim.GetCandy()->SetPos(pos);
+			elapsed += delta_time;
+			anim.SetElapsed(elapsed);
+			if (elapsed >= anim.GetDuration())
+			{
+				completed = true;
+				pos.x = anim.GetEnd().x - ORIGIN_X;
+				pos.y = anim.GetEnd().y - ORIGIN_Y;
+				anim.GetCandy()->SetPos(pos);
+			}
+			break;
+		case AnimationType::DESTROY:
+			break;
+	}
+	// when the animation is done, remove the item from mAnimationQueue
+	if (completed)
+	{
+		mAnimationQueue.erase(mAnimationQueue.begin());
+	}
 }
 
 void CBoard::DoPendingMatches()
@@ -119,6 +178,14 @@ SBoardCoords CBoard::GetBoardTileCoords(int x, int y) const
 		return tileCoords;
 	}
 	return {-1, -1};
+}
+
+SDL_Point CBoard::GetBoardTilePos(SBoardCoords coords) const
+{
+	SDL_Point point;
+	point.x = ORIGIN_X + coords.col * TILE_SIZE;
+	point.y = ORIGIN_Y + coords.row * TILE_SIZE;
+	return point;
 }
 
 void CBoard::Render(SDL_Renderer* renderer)

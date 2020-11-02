@@ -4,9 +4,11 @@
 #include <CMatcher.h>
 #include <ETileType.h>
 #include <SBoardCoords.h>
+#include <CAnimation.h>
 #include <SDL.h>
 #include <set>
 #include <map>
+#include <vector>
 
 class CBoard
 {
@@ -17,12 +19,16 @@ public:
 	void Update(float delta_time);
 	void Render(SDL_Renderer* renderer);
 	SBoardCoords GetBoardTileCoords(int x, int y) const;
+	SDL_Point GetBoardTilePos(SBoardCoords coords) const;
 	void OnClick(SBoardCoords coords);
 	void OnDrag(SBoardCoords startCoords, SBoardCoords endCoords);
 	bool DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2);
 	bool IsMatchInTile(SBoardCoords coords) const;
 	void DoMatchInTile(SBoardCoords coords);
 	void DoPendingMatches();
+	void AddAnimation(AnimationType type, SBoardCoords coordsStart, SBoardCoords coordsEnd, float duration, CCandy* candy);
+	void DoAnimation(float delta_time);
+
 private:
 	std::map<TileType, SDL_Texture*> mTextures;
 	const int TILE_SIZE = 43; // each board tile is 43x43 pixels
@@ -33,4 +39,5 @@ private:
 	CMatcher mMatcher;
 	SBoardCoords mSwappedTileCoords_1;
 	SBoardCoords mSwappedTileCoords_2;
+	std::vector<CAnimation> mAnimationQueue;
 };
