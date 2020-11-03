@@ -28,7 +28,7 @@ public:
 	void DoMatchInTile(SBoardCoords coords);
 	void DoPendingMatches();
 	void AddAnimation(AnimationType type, SBoardCoords coordsStart, SBoardCoords coordsEnd, float duration, CCandy* candy);
-	void DoAnimation(float delta_time);
+	void PlayAllPendingAnimations(float delta_time);
 
 private:
 	std::map<TileType, SDL_Texture*> mTextures;

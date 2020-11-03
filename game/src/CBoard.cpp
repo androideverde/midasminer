@@ -101,11 +101,11 @@ void CBoard::Update(float delta_time)
 	}
 	else
 	{
-		DoAnimation(delta_time);
+		PlayAllPendingAnimations(delta_time);
 	}
 }
 
-void CBoard::DoAnimation(float delta_time)
+void CBoard::PlayAllPendingAnimations(float delta_time)
 {
 	CAnimation& anim = mAnimationQueue.GetNextAnimation();
 	anim.Update(delta_time);
