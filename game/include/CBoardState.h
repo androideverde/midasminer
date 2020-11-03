@@ -15,7 +15,6 @@ class CBoardState
 public:
 	CBoardState(int size, int tileSize, int originX, int originY, std::unique_ptr<const CCandyGenerator> candyGenerator);
 	void SetupBoard(const std::vector<int>& boardDefinition);
-	void SetTile(SBoardCoords coords, TileType type);
 	TileType GetTile(SBoardCoords coords) const;
 	CCandy* GetCandy(SBoardCoords coords);
 	int CountRowNeighboursSameAsTile(SBoardCoords coords) const;

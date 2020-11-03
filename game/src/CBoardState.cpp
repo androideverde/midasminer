@@ -61,12 +61,6 @@ CCandy* CBoardState::GetCandy(SBoardCoords coords)
 	return mCandies[index].get();
 }
 
-void CBoardState::SetTile(SBoardCoords coords, TileType type)
-{
-	int index = GetIndexFromCoords(coords);
-	mCandies[index]->SetType(type);
-}
-
 int CBoardState::GetIndexFromCoords(SBoardCoords coords) const
 {
 	return coords.col + BOARD_SIZE * coords.row;
@@ -228,7 +222,7 @@ void CBoardState::ShiftColumnDown(SBoardCoords coords)
 void CBoardState::AddNewCandy(SBoardCoords coords)
 {
 	TileType newTile = mCandyGenerator->GenerateCandy();
-	SetTile(coords, newTile);
+	GetCandy(coords)->SetType(newTile);
 	std::string tileName = GetTileName(newTile);
 	printf("refilled (%d, %d) with %s\n", coords.row, coords.col, tileName.c_str());
 }
