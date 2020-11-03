@@ -16,9 +16,10 @@ namespace CBoardStateInternal {
 	};
 }
 
-CBoardState::CBoardState(int size, int tile_size, std::unique_ptr<const CCandyGenerator> candyGenerator)
+CBoardState::CBoardState(int size, int tileSize, int originX, int originY, std::unique_ptr<const CCandyGenerator> candyGenerator)
 	: BOARD_SIZE(size)
-	, TILE_SIZE(tile_size)
+	, TILE_SIZE(tileSize)
+	, BOARD_ORIGIN({originX, originY})
 	, mCandyGenerator(std::move(candyGenerator))
 {
 	for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
@@ -33,8 +34,8 @@ SDL_Point CBoardState::ResetCandyPos(int index)
 {
 	SDL_Point point;
 	SBoardCoords coords = GetCoordsFromIndex(index);
-	point.x = coords.col * TILE_SIZE;
-	point.y = coords.row * TILE_SIZE;
+	point.x = coords.col * TILE_SIZE + BOARD_ORIGIN.x;
+	point.y = coords.row * TILE_SIZE + BOARD_ORIGIN.y;
 	return point;
 }
 

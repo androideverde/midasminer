@@ -28,12 +28,12 @@ void CBoard::LoadResources(SDL_Renderer* renderer)
 }
 
 CBoard::CBoard()
-	: mBoardState(BOARD_SIZE, TILE_SIZE, std::make_unique<const CCandyGenerator>())
+	: mBoardState(BOARD_SIZE, TILE_SIZE, ORIGIN_X, ORIGIN_Y, std::make_unique<const CCandyGenerator>())
 	, mMatcher(mBoardState)
 	, mSwappedTileCoords_1()
 	, mSwappedTileCoords_2()
+	, mAnimationQueue()
 {
-	mAnimationQueue.clear();
 }
 
 CBoard::~CBoard()
@@ -84,12 +84,12 @@ void CBoard::AddAnimation(AnimationType type, SBoardCoords coordsStart, SBoardCo
 {
 	SDL_Point startPoint = GetBoardTilePos(coordsStart);
 	SDL_Point endPoint = GetBoardTilePos(coordsEnd);
-	mAnimationQueue.push_back(CAnimation(type, startPoint, endPoint, duration, candy));
+	mAnimationQueue.AddAnimation(CAnimation(type, startPoint, endPoint, duration, candy));
 }
 
 void CBoard::Update(float delta_time)
 {
-	if (mAnimationQueue.empty()) {
+	if (mAnimationQueue.IsEmpty()) {
 		DoPendingMatches();
 		// if there's a pending swap, do it
 		if (mSwappedTileCoords_1.row >= 0 && mSwappedTileCoords_2.row >= 0)
@@ -107,42 +107,11 @@ void CBoard::Update(float delta_time)
 
 void CBoard::DoAnimation(float delta_time)
 {
-	// take the first item in mAnimationQueue
-	CAnimation& anim = mAnimationQueue.at(0);
-	// perform the animation step for that, changing x,y values of the affected candy as needed for this frame
-	float timeStep;
-	int moveStepX;
-	int moveStepY;
-	SDL_Point pos;
-	bool completed = false;
-	float elapsed = 0.f;
-	switch (anim.GetType()) {
-		case AnimationType::MOVE:
-			elapsed = anim.GetElapsed();
-			timeStep = delta_time / (anim.GetDuration() - elapsed);
-			pos = anim.GetCandy()->GetPos();
-			moveStepX = (anim.GetEnd().x - ORIGIN_X - pos.x) * timeStep;
-			moveStepY = (anim.GetEnd().y - ORIGIN_Y - pos.y) * timeStep;
-			pos.x += moveStepX;
-			pos.y += moveStepY;
-			anim.GetCandy()->SetPos(pos);
-			elapsed += delta_time;
-			anim.SetElapsed(elapsed);
-			if (elapsed >= anim.GetDuration())
-			{
-				completed = true;
-				pos.x = anim.GetEnd().x - ORIGIN_X;
-				pos.y = anim.GetEnd().y - ORIGIN_Y;
-				anim.GetCandy()->SetPos(pos);
-			}
-			break;
-		case AnimationType::DESTROY:
-			break;
-	}
-	// when the animation is done, remove the item from mAnimationQueue
-	if (completed)
+	CAnimation& anim = mAnimationQueue.GetNextAnimation();
+	anim.Update(delta_time);
+	if (anim.IsCompleted())
 	{
-		mAnimationQueue.erase(mAnimationQueue.begin());
+		mAnimationQueue.CurrentAnimationComplete();
 	}
 }
 
@@ -197,8 +166,8 @@ void CBoard::Render(SDL_Renderer* renderer)
 		for (int col = 0; col < BOARD_SIZE; col++)
 		{
 			CCandy* candy = mBoardState.GetCandy({row, col});
-			rect.x = ORIGIN_X + candy->GetX();
-			rect.y = ORIGIN_Y + candy->GetY();
+			rect.x = candy->GetX();
+			rect.y = candy->GetY();
 			TileType tile = candy->GetType();
 			SDL_QueryTexture(mTextures.find(tile)->second, nullptr, nullptr, &rect.w, &rect.h);
 			SDL_RenderCopy(renderer, mTextures.find(tile)->second, nullptr, &rect);

@@ -13,7 +13,7 @@
 class CBoardState
 {
 public:
-	CBoardState(int size, int tile_size, std::unique_ptr<const CCandyGenerator> candyGenerator);
+	CBoardState(int size, int tileSize, int originX, int originY, std::unique_ptr<const CCandyGenerator> candyGenerator);
 	void SetupBoard(const std::vector<int>& boardDefinition);
 	void SetTile(SBoardCoords coords, TileType type);
 	TileType GetTile(SBoardCoords coords) const;
@@ -28,6 +28,7 @@ private:
 	std::vector<std::unique_ptr<CCandy>> mCandies;
 	const int BOARD_SIZE;
 	const int TILE_SIZE;
+	const SDL_Point BOARD_ORIGIN;
 	std::unique_ptr<const CCandyGenerator> mCandyGenerator;
 	enum class EDirection {LEFT, RIGHT, UP, DOWN};
 	SBoardCoords GetCoordsFromIndex(int index) const;

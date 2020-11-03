@@ -20,6 +20,8 @@ public:
 	float GetElapsed() const { return mElapsed; }
 	void SetElapsed(float value) { mElapsed = value; }
 	CCandy* GetCandy() { return mItem; }
+	void Update(float delta_time);
+	bool IsCompleted() const { return mCompleted; }
 private:
 	AnimationType mAnimationType;
 	SDL_Point mPositionStart;
@@ -27,4 +29,5 @@ private:
 	float mDuration;
 	float mElapsed;
 	CCandy* mItem;
+	bool mCompleted;
 };

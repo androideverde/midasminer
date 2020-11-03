@@ -4,6 +4,7 @@
 #include <CMatcher.h>
 #include <ETileType.h>
 #include <SBoardCoords.h>
+#include <CAnimationSystem.h>
 #include <CAnimation.h>
 #include <SDL.h>
 #include <set>
@@ -39,5 +40,5 @@ private:
 	CMatcher mMatcher;
 	SBoardCoords mSwappedTileCoords_1;
 	SBoardCoords mSwappedTileCoords_2;
-	std::vector<CAnimation> mAnimationQueue;
+	CAnimationSystem mAnimationQueue;
 };
