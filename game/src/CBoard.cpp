@@ -29,10 +29,10 @@ void CBoard::LoadResources(SDL_Renderer* renderer)
 
 CBoard::CBoard()
 	: mBoardState(BOARD_SIZE, TILE_SIZE, ORIGIN_X, ORIGIN_Y, std::make_unique<const CCandyGenerator>())
-	, mMatcher(mBoardState)
+	, mAnimationQueue()
+	, mMatcher(mBoardState, mAnimationQueue)
 	, mSwappedTileCoords_1()
 	, mSwappedTileCoords_2()
-	, mAnimationQueue()
 {
 }
 
@@ -97,11 +97,22 @@ void CBoard::Update(float delta_time)
 			DoSwap(mSwappedTileCoords_1, mSwappedTileCoords_2);
 			mSwappedTileCoords_1 = mSwappedTileCoords_2 = {-1, -1};
 		}
-		mBoardState.Refill();
+		RefillBoard();
 	}
 	else
 	{
 		PlayAllPendingAnimations(delta_time);
+	}
+}
+
+void CBoard::RefillBoard()
+{
+	std::vector<CCandy*> fallingCandies = mBoardState.Refill();
+	for (CCandy* candy : fallingCandies)
+	{
+		SDL_Point end = candy->GetPos();
+		SDL_Point start = {end.x, end.y - TILE_SIZE};
+		mAnimationQueue.AddAnimation(CAnimation(AnimationType::MOVE, start, end, .5f, candy));
 	}
 }
 

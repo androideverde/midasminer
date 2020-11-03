@@ -17,10 +17,10 @@ void CAnimation::Update(float delta_time)
 	int moveStepX;
 	int moveStepY;
 	SDL_Point pos;
+	timeStep = delta_time / (mDuration - mElapsed);
 	switch (mAnimationType) {
 		case AnimationType::MOVE:
-			timeStep = delta_time / (mDuration - mElapsed);
-			pos = mItem->GetPos();
+			pos = mPositionStart;
 			moveStepX = (mPositionEnd.x - pos.x) * timeStep;
 			moveStepY = (mPositionEnd.y - pos.y) * timeStep;
 			pos.x += moveStepX;
@@ -34,6 +34,11 @@ void CAnimation::Update(float delta_time)
 			}
 			break;
 		case AnimationType::DESTROY:
+			mElapsed += delta_time;
+			if (mElapsed >= mDuration)
+			{
+				mCompleted = true;
+			}
 			break;
 	}
 }

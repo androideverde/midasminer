@@ -29,6 +29,7 @@ public:
 	void DoPendingMatches();
 	void AddAnimation(AnimationType type, SBoardCoords coordsStart, SBoardCoords coordsEnd, float duration, CCandy* candy);
 	void PlayAllPendingAnimations(float delta_time);
+	void RefillBoard();
 
 private:
 	std::map<TileType, SDL_Texture*> mTextures;

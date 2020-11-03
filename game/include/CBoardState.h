@@ -20,7 +20,7 @@ public:
 	int CountRowNeighboursSameAsTile(SBoardCoords coords) const;
 	int CountColNeighboursSameAsTile(SBoardCoords coords) const;
 	std::set<SBoardCoords> GetNeighboursSameAsTile(SBoardCoords coords) const;
-	void Refill();
+	std::vector<CCandy*> Refill();
 	void Swap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2);
 	std::string GetTileName(TileType tile) const;
 private:
@@ -35,7 +35,7 @@ private:
 	std::vector<int> GetNeighbours(SBoardCoords coords, EDirection direction) const;
 	std::vector<int> GetRowNeighboursSameAsTile(SBoardCoords coords) const;
 	std::vector<int> GetColNeighboursSameAsTile(SBoardCoords coords) const;
-	void ShiftColumnDown(SBoardCoords coords);
+	std::vector<SBoardCoords> ShiftColumnDown(SBoardCoords coords);
 	void AddNewCandy(SBoardCoords coords);
 	SDL_Point ResetCandyPos(int index);
 };

@@ -1,7 +1,8 @@
 #include <CMatcher.h>
 
-CMatcher::CMatcher(CBoardState& state)
+CMatcher::CMatcher(CBoardState& state, CAnimationSystem& animationQueue)
 	: mState(state)
+	, mAnimationQueue(animationQueue)
 {
 }
 
@@ -10,7 +11,9 @@ void CMatcher::DoMatchInTile(SBoardCoords coords)
 	std::set<SBoardCoords> matches = mState.GetNeighboursSameAsTile(coords);
 	for (SBoardCoords tileCoords : matches)
 	{
-		mState.SetTile(tileCoords, TileType::EMPTY);
+		CCandy* candy = mState.GetCandy(tileCoords);
+		candy->SetType(TileType::EMPTY);
+		mAnimationQueue.AddAnimation(CAnimation(AnimationType::DESTROY, candy->GetPos(), candy->GetPos(), .2f, candy));
 	}
 }
 

@@ -179,8 +179,9 @@ std::set<SBoardCoords> CBoardState::GetNeighboursSameAsTile(SBoardCoords coords)
 	return matchGroup;
 }
 
-void CBoardState::Refill()
+std::vector<CCandy*> CBoardState::Refill()
 {
+	std::vector<CCandy*> fallingCandies;
 	for (int i = 0; i < BOARD_SIZE; i++)
 	{
 		int row = BOARD_SIZE - 1 - i;
@@ -190,11 +191,17 @@ void CBoardState::Refill()
 			if (tile == TileType::EMPTY)
 			{
 				printf("found empty tile (%d, %d)\n", row, col);
-				ShiftColumnDown({row, col});
+				std::vector<SBoardCoords> fallingTiles = ShiftColumnDown({row, col});
 				AddNewCandy({0, col});
+				fallingTiles.push_back({0, col});
+				for (SBoardCoords coord : fallingTiles)
+				{
+					fallingCandies.push_back(GetCandy(coord));
+				}
 			}
 		}
 	}
+	return fallingCandies;
 }
 
 void CBoardState::Swap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
@@ -206,8 +213,9 @@ void CBoardState::Swap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 	mCandies[index_2]->SetPos(ResetCandyPos(index_2));
 }
 
-void CBoardState::ShiftColumnDown(SBoardCoords coords)
+std::vector<SBoardCoords> CBoardState::ShiftColumnDown(SBoardCoords coords)
 {
+	std::vector<SBoardCoords> fallingTiles;
 	for (int i = 0; i < coords.row; i++)
 	{
 		SBoardCoords current;
@@ -215,8 +223,10 @@ void CBoardState::ShiftColumnDown(SBoardCoords coords)
 		current.row = coords.row - i;
 		above.row = coords.row - 1 - i;
 		current.col = above.col = coords.col;
+		fallingTiles.push_back(current);
 		Swap(current, above);
 	}
+	return fallingTiles;
 }
 
 void CBoardState::AddNewCandy(SBoardCoords coords)
