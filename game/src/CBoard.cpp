@@ -2,9 +2,9 @@
 
 #include <Utils.h>
 #include <set>
-
 #include <vector>
 #include <CCandy.h>
+#include <CMoveAnimation.h>
 
 namespace CBoardInternal {
 	std::map<TileType, const std::string> TextureFiles =
@@ -59,8 +59,8 @@ void CBoard::OnDrag(SBoardCoords startCoords, SBoardCoords endCoords)
 bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 {
 	// do swap
-	AddAnimation(AnimationType::MOVE, tileCoords_1, tileCoords_2, .4f, mBoardState.GetCandy(tileCoords_1));
-	AddAnimation(AnimationType::MOVE, tileCoords_2, tileCoords_1, .4f, mBoardState.GetCandy(tileCoords_2));
+	AddMoveAnimation(tileCoords_1, tileCoords_2, .4f, mBoardState.GetCandy(tileCoords_1));
+	AddMoveAnimation(tileCoords_2, tileCoords_1, .4f, mBoardState.GetCandy(tileCoords_2));
 	mBoardState.Swap(tileCoords_1, tileCoords_2);
 	// check for matches at each tile
 	if (mMatcher.IsMatchInTile(tileCoords_1))
@@ -74,17 +74,17 @@ bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 	else
 	{
 		// if not match, undo swap
-		AddAnimation(AnimationType::MOVE, tileCoords_1, tileCoords_2, .4f, mBoardState.GetCandy(tileCoords_1));
-		AddAnimation(AnimationType::MOVE, tileCoords_2, tileCoords_1, .4f, mBoardState.GetCandy(tileCoords_2));
+		AddMoveAnimation(tileCoords_1, tileCoords_2, .4f, mBoardState.GetCandy(tileCoords_1));
+		AddMoveAnimation(tileCoords_2, tileCoords_1, .4f, mBoardState.GetCandy(tileCoords_2));
 		mBoardState.Swap(tileCoords_2, tileCoords_1);
 	}
 }
 
-void CBoard::AddAnimation(AnimationType type, SBoardCoords coordsStart, SBoardCoords coordsEnd, float duration, CCandy* candy)
+void CBoard::AddMoveAnimation(SBoardCoords coordsStart, SBoardCoords coordsEnd, float duration, CCandy* candy)
 {
 	SDL_Point startPoint = GetBoardTilePos(coordsStart);
 	SDL_Point endPoint = GetBoardTilePos(coordsEnd);
-	mAnimationQueue.AddAnimation(CAnimation(type, startPoint, endPoint, duration, candy));
+	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(startPoint, endPoint, duration, candy));
 }
 
 void CBoard::Update(float delta_time)
@@ -112,7 +112,7 @@ void CBoard::RefillBoard()
 	{
 		SDL_Point end = candy->GetPos();
 		SDL_Point start = {end.x, end.y - TILE_SIZE};
-		mAnimationQueue.AddAnimation(CAnimation(AnimationType::MOVE, start, end, .5f, candy));
+		mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(start, end, .5f, candy));
 	}
 }
 

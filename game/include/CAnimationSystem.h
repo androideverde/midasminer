@@ -7,10 +7,10 @@ class CAnimationSystem
 {
 public:
 	CAnimationSystem();
-	void AddAnimation(CAnimation animation);
+	void AddAnimation(std::unique_ptr<CAnimation> animation);
 	bool IsEmpty() const { return mAnimationQueue.empty(); }
-	CAnimation& GetNextAnimation() { return mAnimationQueue.at(0); }
+	CAnimation& GetNextAnimation() { return *(mAnimationQueue.at(0)); }
 	void CurrentAnimationComplete();
 private:
-	std::vector<CAnimation> mAnimationQueue;
+	std::vector<std::unique_ptr<CAnimation>> mAnimationQueue;
 };

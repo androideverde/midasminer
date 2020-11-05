@@ -1,5 +1,7 @@
 #include <CMatcher.h>
 
+#include <CDestroyAnimation.h>
+
 CMatcher::CMatcher(CBoardState& state, CAnimationSystem& animationQueue)
 	: mState(state)
 	, mAnimationQueue(animationQueue)
@@ -13,7 +15,7 @@ void CMatcher::DoMatchInTile(SBoardCoords coords)
 	{
 		CCandy* candy = mState.GetCandy(tileCoords);
 		candy->SetType(TileType::EMPTY);
-		mAnimationQueue.AddAnimation(CAnimation(AnimationType::DESTROY, candy->GetPos(), candy->GetPos(), .2f, candy));
+		mAnimationQueue.AddAnimation(std::make_unique<CDestroyAnimation>(.2f, candy));
 	}
 }
 

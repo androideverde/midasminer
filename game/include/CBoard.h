@@ -5,7 +5,6 @@
 #include <ETileType.h>
 #include <SBoardCoords.h>
 #include <CAnimationSystem.h>
-#include <CAnimation.h>
 #include <SDL.h>
 #include <set>
 #include <map>
@@ -27,7 +26,7 @@ public:
 	bool IsMatchInTile(SBoardCoords coords) const;
 	void DoMatchInTile(SBoardCoords coords);
 	void DoPendingMatches();
-	void AddAnimation(AnimationType type, SBoardCoords coordsStart, SBoardCoords coordsEnd, float duration, CCandy* candy);
+	void AddMoveAnimation(SBoardCoords coordsStart, SBoardCoords coordsEnd, float duration, CCandy* candy);
 	void PlayAllPendingAnimations(float delta_time);
 	void RefillBoard();
 
