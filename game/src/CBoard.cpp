@@ -59,8 +59,7 @@ void CBoard::OnDrag(SBoardCoords startCoords, SBoardCoords endCoords)
 bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 {
 	// do swap
-	AddMoveAnimation(tileCoords_1, tileCoords_2, .4f, mBoardState.GetCandy(tileCoords_1));
-	AddMoveAnimation(tileCoords_2, tileCoords_1, .4f, mBoardState.GetCandy(tileCoords_2));
+	TriggerSwapAnimations(tileCoords_1, tileCoords_2);
 	mBoardState.Swap(tileCoords_1, tileCoords_2);
 	// check for matches at each tile
 	if (mMatcher.IsMatchInTile(tileCoords_1))
@@ -74,22 +73,22 @@ bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 	else
 	{
 		// if not match, undo swap
-		AddMoveAnimation(tileCoords_1, tileCoords_2, .4f, mBoardState.GetCandy(tileCoords_1));
-		AddMoveAnimation(tileCoords_2, tileCoords_1, .4f, mBoardState.GetCandy(tileCoords_2));
+		TriggerSwapAnimations(tileCoords_1, tileCoords_2);
 		mBoardState.Swap(tileCoords_2, tileCoords_1);
 	}
 }
 
-void CBoard::AddMoveAnimation(SBoardCoords coordsStart, SBoardCoords coordsEnd, float duration, CCandy* candy)
+void CBoard::TriggerSwapAnimations(SBoardCoords tile_1, SBoardCoords tile_2)
 {
-	SDL_Point startPoint = GetBoardTilePos(coordsStart);
-	SDL_Point endPoint = GetBoardTilePos(coordsEnd);
-	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(startPoint, endPoint, duration, candy));
+	SDL_Point point_1 = GetBoardTilePos(tile_1);
+	SDL_Point point_2 = GetBoardTilePos(tile_2);
+	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(point_1, point_2, .4f, mBoardState.GetCandy(tile_1)));
+	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(point_2, point_1, .4f, mBoardState.GetCandy(tile_2)));
 }
 
 void CBoard::Update(float delta_time)
 {
-	if (mAnimationQueue.IsEmpty()) {
+	if (mAnimationQueue.AllAnimationsCompleted()) {
 		DoPendingMatches();
 		// if there's a pending swap, do it
 		if (mSwappedTileCoords_1.row >= 0 && mSwappedTileCoords_2.row >= 0)

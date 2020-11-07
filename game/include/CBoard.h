@@ -26,7 +26,7 @@ public:
 	bool IsMatchInTile(SBoardCoords coords) const;
 	void DoMatchInTile(SBoardCoords coords);
 	void DoPendingMatches();
-	void AddMoveAnimation(SBoardCoords coordsStart, SBoardCoords coordsEnd, float duration, CCandy* candy);
+	void TriggerSwapAnimations(SBoardCoords tile_1, SBoardCoords tile_2);
 	void PlayAllPendingAnimations(float delta_time);
 	void RefillBoard();
 
