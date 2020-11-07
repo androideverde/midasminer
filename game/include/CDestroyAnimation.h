@@ -9,4 +9,6 @@ public:
 	CDestroyAnimation(float duration, CCandy* candy);
 	~CDestroyAnimation();
 	void Update(float delta_time);
+private:
+	CCandy* mCandy;
 };

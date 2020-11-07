@@ -3,7 +3,10 @@
 #include <cassert>
 
 CMoveAnimation::CMoveAnimation(SDL_Point start, SDL_Point end, float duration, CCandy* candy)
-	: CAnimation(start, end, duration, candy)
+	: mPositionStart(start)
+	, mPositionEnd(end)
+	, mCandy(candy)
+	, CAnimation(duration)
 {
 }
 
@@ -24,11 +27,11 @@ void CMoveAnimation::Update(float delta_time)
 	moveStepY = (mPositionEnd.y - pos.y) * timeStep;
 	pos.x += moveStepX;
 	pos.y += moveStepY;
-	mItem->SetPos(pos);
+	mCandy->SetPos(pos);
 	mElapsed += delta_time;
 	if (mElapsed >= mDuration)
 	{
 		mCompleted = true;
-		mItem->SetPos(mPositionEnd);
+		mCandy->SetPos(mPositionEnd);
 	}
 }

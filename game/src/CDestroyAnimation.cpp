@@ -1,7 +1,8 @@
 #include <CDestroyAnimation.h>
 
 CDestroyAnimation::CDestroyAnimation(float duration, CCandy* candy)
-	: CAnimation({0, 0}, {0, 0}, duration, candy)
+	: mCandy(candy)
+	, CAnimation(duration)
 {
 }
 
