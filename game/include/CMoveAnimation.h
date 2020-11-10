@@ -7,7 +7,6 @@ class CMoveAnimation
 {
 public:
 	CMoveAnimation(SDL_Point start, SDL_Point end, float duration, CCandy* candy);
-	~CMoveAnimation();
 	void Update(float delta_time) override;
 	SDL_Point GetStart() const { return mPositionStart; }
 	SDL_Point GetEnd() const { return mPositionEnd; }

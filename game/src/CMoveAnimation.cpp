@@ -10,10 +10,6 @@ CMoveAnimation::CMoveAnimation(SDL_Point start, SDL_Point end, float duration, C
 {
 }
 
-CMoveAnimation::~CMoveAnimation()
-{
-}
-
 void CMoveAnimation::Update(float delta_time)
 {
 	float timeStep;

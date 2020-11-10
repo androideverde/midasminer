@@ -6,7 +6,3 @@ CAnimation::CAnimation(float duration)
 	, mCompleted(false)
 {
 }
-
-CAnimation::~CAnimation()
-{
-}

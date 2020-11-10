@@ -6,10 +6,6 @@ CDestroyAnimation::CDestroyAnimation(float duration, CCandy* candy)
 {
 }
 
-CDestroyAnimation::~CDestroyAnimation()
-{
-}
-
 void CDestroyAnimation::Update(float delta_time)
 {
 	mElapsed += delta_time;

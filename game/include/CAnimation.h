@@ -7,7 +7,7 @@ class CAnimation
 {
 public:
 	CAnimation(float duration);
-	virtual ~CAnimation();
+	virtual ~CAnimation() = default;
 	virtual void Update(float delta_time) = 0;
 	float GetDuration() const { return mDuration; }
 	bool IsCompleted() const { return mCompleted; }

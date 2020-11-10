@@ -7,8 +7,7 @@ class CDestroyAnimation
 {
 public:
 	CDestroyAnimation(float duration, CCandy* candy);
-	~CDestroyAnimation();
-	void Update(float delta_time);
+	void Update(float delta_time) override;
 private:
 	CCandy* mCandy;
 };
