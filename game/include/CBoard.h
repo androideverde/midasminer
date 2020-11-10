@@ -27,7 +27,6 @@ public:
 	void DoMatchInTile(SBoardCoords coords);
 	void DoPendingMatches();
 	void TriggerSwapAnimations(SBoardCoords tile_1, SBoardCoords tile_2);
-	void PlayAllPendingAnimations(float delta_time);
 	void RefillBoard();
 
 private:

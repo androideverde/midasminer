@@ -5,6 +5,7 @@
 #include <vector>
 #include <CCandy.h>
 #include <CMoveAnimation.h>
+#include <CParallelAnimation.h>
 
 namespace CBoardInternal {
 	std::map<TileType, const std::string> TextureFiles =
@@ -82,12 +83,15 @@ void CBoard::TriggerSwapAnimations(SBoardCoords tile_1, SBoardCoords tile_2)
 {
 	SDL_Point point_1 = GetBoardTilePos(tile_1);
 	SDL_Point point_2 = GetBoardTilePos(tile_2);
-	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(point_1, point_2, .4f, mBoardState.GetCandy(tile_1)));
-	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(point_2, point_1, .4f, mBoardState.GetCandy(tile_2)));
+	std::vector<std::unique_ptr<CAnimation>> parallelAnims;
+	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(point_1, point_2, .4f, mBoardState.GetCandy(tile_1)));
+	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(point_2, point_1, .4f, mBoardState.GetCandy(tile_2)));
+	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(.4f, std::move(parallelAnims)));
 }
 
 void CBoard::Update(float delta_time)
 {
+	mAnimationQueue.Update(delta_time);
 	if (mAnimationQueue.AllAnimationsCompleted()) {
 		DoPendingMatches();
 		// if there's a pending swap, do it
@@ -98,30 +102,21 @@ void CBoard::Update(float delta_time)
 		}
 		RefillBoard();
 	}
-	else
-	{
-		PlayAllPendingAnimations(delta_time);
-	}
 }
 
 void CBoard::RefillBoard()
 {
+	//get falling candies
+	//make them fall
+	//get new candies
+	//make them appear + fall
+	//update model
 	std::vector<CCandy*> fallingCandies = mBoardState.Refill();
 	for (CCandy* candy : fallingCandies)
 	{
 		SDL_Point end = candy->GetPos();
 		SDL_Point start = {end.x, end.y - TILE_SIZE};
 		mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(start, end, .5f, candy));
-	}
-}
-
-void CBoard::PlayAllPendingAnimations(float delta_time)
-{
-	CAnimation& anim = mAnimationQueue.GetNextAnimation();
-	anim.Update(delta_time);
-	if (anim.IsCompleted())
-	{
-		mAnimationQueue.CurrentAnimationComplete();
 	}
 }
 
