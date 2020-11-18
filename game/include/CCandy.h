@@ -1,21 +1,29 @@
 #pragma once
 
 #include <SDL.h>
-#include <ETileType.h>
+
+enum class CandyType {
+	EMPTY,
+	BLUE,
+	GREEN,
+	RED,
+	YELLOW,
+	PURPLE
+};
 
 class CCandy
 {
 public:
-	CCandy(TileType tileType);
-	CCandy(TileType tileType, SDL_Point pos);
-	TileType GetType() const { return mTileType; }
+	CCandy(CandyType tileType);
+	CCandy(CandyType tileType, SDL_Point pos);
+	CandyType GetType() const { return mTileType; }
 	int GetX() const { return mPoint.x; }
 	int GetY() const { return mPoint.y; }
 	SDL_Point GetPos() const { return mPoint; }
-	void SetType(TileType tileType);
+	void SetType(CandyType tileType);
 	void SetPos(int x, int y);
 	void SetPos(SDL_Point point);
 private:
 	SDL_Point mPoint;
-	TileType mTileType;
+	CandyType mTileType;
 };

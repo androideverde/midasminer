@@ -3,19 +3,18 @@
 #include <Utils.h>
 #include <set>
 #include <vector>
-#include <CCandy.h>
 #include <CMoveAnimation.h>
 #include <CParallelAnimation.h>
 
 namespace CBoardInternal {
-	std::map<TileType, const std::string> TextureFiles =
+	std::map<CandyType, const std::string> TextureFiles =
 	{
-		{TileType::RED, "../assets/Red.png"},
-		{TileType::GREEN, "../assets/Green.png"},
-		{TileType::BLUE, "../assets/Blue.png"},
-		{TileType::YELLOW, "../assets/Yellow.png"},
-		{TileType::PURPLE, "../assets/Purple.png"},
-		{TileType::EMPTY, "../assets/Empty.png"}
+		{CandyType::RED, "../assets/Red.png"},
+		{CandyType::GREEN, "../assets/Green.png"},
+		{CandyType::BLUE, "../assets/Blue.png"},
+		{CandyType::YELLOW, "../assets/Yellow.png"},
+		{CandyType::PURPLE, "../assets/Purple.png"},
+		{CandyType::EMPTY, "../assets/Empty.png"}
 	};
 }
 
@@ -60,7 +59,7 @@ void CBoard::OnDrag(SBoardCoords startCoords, SBoardCoords endCoords)
 bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 {
 	// do swap
-	TriggerSwapAnimations(tileCoords_1, tileCoords_2);
+	TriggerSwapInAnimations(tileCoords_1, tileCoords_2);
 	mBoardState.Swap(tileCoords_1, tileCoords_2);
 	// check for matches at each tile
 	if (mMatcher.IsMatchInTile(tileCoords_1))
@@ -74,15 +73,25 @@ bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 	else
 	{
 		// if not match, undo swap
-		TriggerSwapAnimations(tileCoords_1, tileCoords_2);
+		TriggerSwapOutAnimations(tileCoords_1, tileCoords_2);
 		mBoardState.Swap(tileCoords_2, tileCoords_1);
 	}
 }
 
-void CBoard::TriggerSwapAnimations(SBoardCoords tile_1, SBoardCoords tile_2)
+void CBoard::TriggerSwapInAnimations(SBoardCoords tile_1, SBoardCoords tile_2)
 {
-	SDL_Point point_1 = GetBoardTilePos(tile_1);
-	SDL_Point point_2 = GetBoardTilePos(tile_2);
+	SDL_Point point_1 = mBoardState.GetCandy(tile_1)->GetPos();
+	SDL_Point point_2 = mBoardState.GetCandy(tile_2)->GetPos();
+	std::vector<std::unique_ptr<CAnimation>> parallelAnims;
+	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(point_1, point_2, .4f, mBoardState.GetCandy(tile_1)));
+	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(point_2, point_1, .4f, mBoardState.GetCandy(tile_2)));
+	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(.4f, std::move(parallelAnims)));
+}
+
+void CBoard::TriggerSwapOutAnimations(SBoardCoords tile_1, SBoardCoords tile_2)
+{
+	SDL_Point point_1 = mBoardState.GetCandy(tile_2)->GetPos();
+	SDL_Point point_2 = mBoardState.GetCandy(tile_1)->GetPos();
 	std::vector<std::unique_ptr<CAnimation>> parallelAnims;
 	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(point_1, point_2, .4f, mBoardState.GetCandy(tile_1)));
 	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(point_2, point_1, .4f, mBoardState.GetCandy(tile_2)));
@@ -106,17 +115,38 @@ void CBoard::Update(float delta_time)
 
 void CBoard::RefillBoard()
 {
-	//get falling candies
-	//make them fall
-	//get new candies
+	std::map<CCandy*, int> fallingCandies = mBoardState.GetFallingCandies();
+	MakeCandiesFall(fallingCandies);
+	std::map<std::unique_ptr<CCandy>, int> newCandies = mBoardState.GenerateNewCandies();
+	std::map<const CCandy*, int> newCandiesCopy;
+	for (const auto& it : newCandies)
+	{
+		newCandiesCopy.insert({it.first.get(), it.second});
+	}
+	AddNewCandies(newCandiesCopy);
 	//make them appear + fall
 	//update model
-	std::vector<CCandy*> fallingCandies = mBoardState.Refill();
-	for (CCandy* candy : fallingCandies)
+	mBoardState.Refill();
+}
+
+void CBoard::MakeCandiesFall(std::map<CCandy*, int> fallingCandies)
+{
+	std::vector<std::unique_ptr<CAnimation>> parallelAnims;
+	for (auto const& it : fallingCandies)
 	{
-		SDL_Point end = candy->GetPos();
-		SDL_Point start = {end.x, end.y - TILE_SIZE};
-		mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(start, end, .5f, candy));
+		SDL_Point start = it.first->GetPos();
+		SDL_Point end = {start.x, start.y + TILE_SIZE * it.second};
+		parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(start, end, .5f, it.first));
+	}
+	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(.5f, std::move(parallelAnims)));
+}
+
+void CBoard::AddNewCandies(const std::map<const CCandy*, int>& newCandies)
+{
+	for (auto const& it : newCandies)
+	{
+		SDL_Point start = it.first->GetPos();
+		SDL_Point end;
 	}
 }
 
@@ -129,7 +159,7 @@ void CBoard::DoPendingMatches()
 		for (int col = 0; col < BOARD_SIZE; col++)
 		{
 			coords.col = col;
-			if (mBoardState.GetTile(coords) == TileType::EMPTY)
+			if (mBoardState.GetCandyType(coords) == CandyType::EMPTY)
 			{
 				continue;
 			}
@@ -154,14 +184,6 @@ SBoardCoords CBoard::GetBoardTileCoords(int x, int y) const
 	return {-1, -1};
 }
 
-SDL_Point CBoard::GetBoardTilePos(SBoardCoords coords) const
-{
-	SDL_Point point;
-	point.x = ORIGIN_X + coords.col * TILE_SIZE;
-	point.y = ORIGIN_Y + coords.row * TILE_SIZE;
-	return point;
-}
-
 void CBoard::Render(SDL_Renderer* renderer)
 {
 	SDL_Rect rect = {0, 0, 0, 0};
@@ -173,7 +195,7 @@ void CBoard::Render(SDL_Renderer* renderer)
 			CCandy* candy = mBoardState.GetCandy({row, col});
 			rect.x = candy->GetX();
 			rect.y = candy->GetY();
-			TileType tile = candy->GetType();
+			CandyType tile = candy->GetType();
 			SDL_QueryTexture(mTextures.find(tile)->second, nullptr, nullptr, &rect.w, &rect.h);
 			SDL_RenderCopy(renderer, mTextures.find(tile)->second, nullptr, &rect);
 		}

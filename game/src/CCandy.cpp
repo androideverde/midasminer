@@ -1,18 +1,18 @@
 #include <CCandy.h>
 
-CCandy::CCandy(TileType tileType)
+CCandy::CCandy(CandyType tileType)
 	: mTileType(tileType)
 	, mPoint({0, 0})
 {
 }
 
-CCandy::CCandy(TileType tileType, SDL_Point pos)
+CCandy::CCandy(CandyType tileType, SDL_Point pos)
 	: mTileType(tileType)
 	, mPoint(pos)
 {
 }
 
-void CCandy::SetType(TileType tileType)
+void CCandy::SetType(CandyType tileType)
 {
 	mTileType = tileType;
 }

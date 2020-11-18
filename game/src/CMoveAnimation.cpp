@@ -29,5 +29,6 @@ void CMoveAnimation::Update(float delta_time)
 	{
 		mCompleted = true;
 		mCandy->SetPos(mPositionEnd);
+		printf("move anim done! (%d, %d) -> (%d, %d) %d\n", mPositionStart.x, mPositionStart.y, mPositionEnd.x, mPositionEnd.y, mCandy->GetType());
 	}
 }

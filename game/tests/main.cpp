@@ -14,9 +14,9 @@ TEST(board, check_refill)
 	class TestCandyGenerator : public CCandyGenerator
 	{
 	public:
-		TileType GenerateCandy() const override
+		CandyType GenerateCandy() const override
 		{
-			return TileType::BLUE;
+			return CandyType::BLUE;
 		}
 	};
 	std::vector<int> testBoard = {

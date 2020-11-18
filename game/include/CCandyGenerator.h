@@ -1,9 +1,9 @@
 #pragma once
 
-#include <ETileType.h>
+#include <CCandy.h>
 
 class CCandyGenerator
 {
 public:
-	virtual TileType GenerateCandy() const;
+	virtual CandyType GenerateCandy() const;
 };
