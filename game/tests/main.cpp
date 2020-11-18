@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <CBoardState.h>
-#include <ETileType.h>
+#include <CCandy.h>
 #include <CCandyGenerator.h>
 
 int main(int argc, char **argv) {
@@ -29,8 +29,8 @@ TEST(board, check_refill)
 		1, 2, 3, 4, 5, 1, 2, 3,
 		1, 2, 3, 4, 5, 1, 2, 3,
 	};
-	CBoardState boardState(8, 43, std::make_unique<const TestCandyGenerator>());
+	CBoardState boardState(8, 43, 0, 0, std::make_unique<const TestCandyGenerator>());
 	boardState.SetupBoard(testBoard);
 	boardState.Refill();
-	EXPECT_EQ(boardState.GetTile({0, 1}), TileType::BLUE);
+	EXPECT_EQ(boardState.GetCandy({0, 1})->GetType(), CandyType::BLUE);
 }
