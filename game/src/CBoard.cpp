@@ -92,9 +92,8 @@ void CBoard::TriggerSwapOutAnimations(SBoardCoords tile_1, SBoardCoords tile_2)
 void CBoard::TriggerFallAnimation(SBoardCoords origin, SBoardCoords destination)
 {
 	CCandy* candy = mBoardState.GetTile(origin).GetCandy();
-	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(candy->GetPos(), GetBoardTilePos(destination), .4f, candy));
+	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(candy->GetPos(), GetBoardTilePos(destination), .3f, candy));
 }
-
 
 void CBoard::Update(float delta_time)
 {
