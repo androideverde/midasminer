@@ -2,6 +2,8 @@
 
 #include <CBoardState.h>
 #include <CMatcher.h>
+#include <CSwapper.h>
+#include <CRefiller.h>
 #include <SBoardCoords.h>
 #include <CAnimationSystem.h>
 #include <CCandy.h>
@@ -19,18 +21,9 @@ public:
 	void Update(float delta_time);
 	void Render(SDL_Renderer* renderer) const;
 	SBoardCoords GetBoardTileCoords(int x, int y) const;
-	SDL_Point GetBoardTilePos(SBoardCoords coords) const;
 	void OnClick(SBoardCoords coords);
 	void OnDrag(SBoardCoords startCoords, SBoardCoords endCoords);
-	bool DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2);
-	std::set<SBoardCoords> DoMatch();
-	void TriggerSwapInAnimations(SBoardCoords tile_1, SBoardCoords tile_2);
-	void TriggerSwapOutAnimations(SBoardCoords tile_1, SBoardCoords tile_2);
-	void TriggerFallAnimation(SBoardCoords origin, SBoardCoords destination);
-	void RefillBoard();
-	bool IsMatchPending() const;
 	bool IsSwapPending() const;
-	bool IsRefillPending() const;
 
 private:
 	std::map<CandyType, SDL_Texture*> mTextures;
@@ -40,6 +33,8 @@ private:
 	const int BOARD_SIZE = 8; // board is 8x8 tiles
 	CBoardState mBoardState;
 	CMatcher mMatcher;
+	CSwapper mSwapper;
+	CRefiller mRefiller;
 	SBoardCoords mSwappedTileCoords_1;
 	SBoardCoords mSwappedTileCoords_2;
 	CAnimationSystem mAnimationQueue;

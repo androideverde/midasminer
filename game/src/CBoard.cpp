@@ -31,6 +31,8 @@ CBoard::CBoard()
 	: mBoardState(BOARD_SIZE, TILE_SIZE, ORIGIN_X, ORIGIN_Y, std::make_unique<const CCandyGenerator>())
 	, mAnimationQueue()
 	, mMatcher(mBoardState, mAnimationQueue)
+	, mSwapper(mBoardState, mAnimationQueue, mMatcher)
+	, mRefiller(mBoardState, mAnimationQueue)
 	, mSwappedTileCoords_1()
 	, mSwappedTileCoords_2()
 {
@@ -56,45 +58,6 @@ void CBoard::OnDrag(SBoardCoords startCoords, SBoardCoords endCoords)
 	printf("Drag completed: from (%d,%d) to (%d,%d)\n", startCoords.row, startCoords.col, endCoords.row, endCoords.col);
 }
 
-bool CBoard::DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
-{
-	// do swap
-	TriggerSwapInAnimations(tileCoords_1, tileCoords_2);
-	mBoardState.Swap(tileCoords_1, tileCoords_2);
-	if (!(mMatcher.IsMatchInTile(tileCoords_1) || mMatcher.IsMatchInTile(tileCoords_2)))
-	{
-		// if not match, undo swap
-		TriggerSwapOutAnimations(tileCoords_1, tileCoords_2);
-		mBoardState.Swap(tileCoords_2, tileCoords_1);
-	}
-}
-
-void CBoard::TriggerSwapInAnimations(SBoardCoords tile_1, SBoardCoords tile_2)
-{
-	CCandy* candy_1 = mBoardState.GetTile(tile_1).GetCandy();
-	CCandy* candy_2 = mBoardState.GetTile(tile_2).GetCandy();
-	std::vector<std::unique_ptr<CAnimation>> parallelAnims;
-	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(candy_1->GetPos(), candy_2->GetPos(), .4f, candy_1));
-	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(candy_2->GetPos(), candy_1->GetPos(), .4f, candy_2));
-	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(.4f, std::move(parallelAnims)));
-}
-
-void CBoard::TriggerSwapOutAnimations(SBoardCoords tile_1, SBoardCoords tile_2)
-{
-	CCandy* candy_1 = mBoardState.GetTile(tile_2).GetCandy();
-	CCandy* candy_2 = mBoardState.GetTile(tile_1).GetCandy();
-	std::vector<std::unique_ptr<CAnimation>> parallelAnims;
-	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(candy_1->GetPos(), candy_2->GetPos(), .4f, candy_2));
-	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(candy_2->GetPos(), candy_1->GetPos(), .4f, candy_1));
-	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(.4f, std::move(parallelAnims)));
-}
-
-void CBoard::TriggerFallAnimation(SBoardCoords origin, SBoardCoords destination)
-{
-	CCandy* candy = mBoardState.GetTile(origin).GetCandy();
-	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(candy->GetPos(), GetBoardTilePos(destination), .3f, candy));
-}
-
 void CBoard::Update(float delta_time)
 {
 	// switch
@@ -108,138 +71,25 @@ void CBoard::Update(float delta_time)
 	//        doSwap()
 	mAnimationQueue.Update(delta_time);
 	if (mAnimationQueue.AllAnimationsCompleted()) {
-		if (IsRefillPending())
+		if (mRefiller.IsRefillPending())
 		{
-			RefillBoard();
+			mRefiller.RefillBoard();
 		}
-		else if (IsMatchPending())
+		else if (mMatcher.IsMatchPending())
 		{
 			mMatcher.DoMatch();
 		}
 		else if (IsSwapPending())
 		{
-			DoSwap(mSwappedTileCoords_1, mSwappedTileCoords_2);
+			mSwapper.DoSwap(mSwappedTileCoords_1, mSwappedTileCoords_2);
 			mSwappedTileCoords_1 = mSwappedTileCoords_2 = {-100, -100};
 		}
 	}
 }
 
-bool CBoard::IsMatchPending() const
-{
-	SBoardCoords coords;
-	for (int row = 0; row < BOARD_SIZE; row++)
-	{
-		coords.row = row;
-		for (int col = 0; col < BOARD_SIZE; col++)
-		{
-			coords.col = col;
-			if (mMatcher.IsMatchInTile(coords))
-			{
-				printf("Match found in (%d, %d)!\n", coords.row, coords.col);
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-bool CBoard::IsRefillPending() const
-{
-	SBoardCoords coords;
-	for (int row = 0; row < BOARD_SIZE; row++)
-	{
-		coords.row = row;
-		for (int col = 0; col < BOARD_SIZE; col++)
-		{
-			coords.col = col;
-			if (mBoardState.GetTile(coords).GetCandy() == nullptr)
-			{
-				printf("We need to refill! Empty found in (%d, %d)!\n", coords.row, coords.col);
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
 bool CBoard::IsSwapPending() const
 {
 	return mSwappedTileCoords_1.row >= 0 && mSwappedTileCoords_2.row >= 0;
-}
-
-void CBoard::RefillBoard()
-{
-	std::vector<int> emptiesInCol;
-	emptiesInCol.clear();
-	SBoardCoords coords;
-	
-	// find empty tiles in board
-	for (int col = 0; col < BOARD_SIZE; col++)
-	{
-		coords.col = col;
-		emptiesInCol.push_back(0);
-		for (int rowIndex = 0; rowIndex < BOARD_SIZE; rowIndex++)
-		{
-			coords.row = BOARD_SIZE - 1 - rowIndex;
-			if (mBoardState.GetTile(coords).GetCandy() == nullptr)
-			{
-				printf("Empty found in (%d, %d)\n", coords.row, coords.col);
-				emptiesInCol[col]++;
-				SBoardCoords above;
-				// find first non-empty tile going up in column
-				for (int i = 1; i < coords.row + 1; i++)
-				{
-					if (mBoardState.GetTile({coords.row - i, col}).GetCandy() != nullptr)
-					{
-						above = {coords.row - i, col};
-						printf("Will fill (%d, %d) with (%d, %d)\n", coords.row, coords.col, above.row, above.col);
-						break;
-					}
-				}
-				// above is the first non-empty tile or (-100,-100) if there's nothing above
-				if (above.row != -100 && above.col != -100)
-				{
-					TriggerFallAnimation(above, coords);
-					mBoardState.Swap(coords, above);
-					emptiesInCol[col]--;
-				}
-			}
-		}
-	}
-	// create new candies to fill empty tiles
-	for (int col = 0; col < BOARD_SIZE; col++)
-	{
-		int empties = emptiesInCol[col];
-		for (int i = 1; i <= empties; i++)
-		{
-			SBoardCoords coords = {0, col};
-			SBoardCoords destination = {empties - i, col};
-			mBoardState.AddNewCandy(coords);
-			TriggerFallAnimation(coords, destination);
-			mBoardState.Swap(coords, destination);
-		}
-	}
-}
-
-std::set<SBoardCoords> CBoard::DoMatch()
-{
-	SBoardCoords coords;
-	for (int row = 0; row < BOARD_SIZE; row++)
-	{
-		coords.row = row;
-		for (int col = 0; col < BOARD_SIZE; col++)
-		{
-			coords.col = col;
-			if (mBoardState.GetTile(coords).GetCandy() == nullptr)
-			{
-				continue;
-			}
-			if (mMatcher.IsMatchInTile(coords))
-			{
-				return mMatcher.DoMatchInTile(coords);
-			}
-		}
-	}
 }
 
 SBoardCoords CBoard::GetBoardTileCoords(int x, int y) const
@@ -253,14 +103,6 @@ SBoardCoords CBoard::GetBoardTileCoords(int x, int y) const
 		return tileCoords;
 	}
 	return {-100, -100};
-}
-
-SDL_Point CBoard::GetBoardTilePos(SBoardCoords coords) const
-{
-	SDL_Point pos;
-	pos.x = ORIGIN_X + coords.col * TILE_SIZE;
-	pos.y = ORIGIN_Y + coords.row * TILE_SIZE;
-	return pos;
 }
 
 void CBoard::Render(SDL_Renderer* renderer) const

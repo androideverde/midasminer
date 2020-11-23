@@ -61,3 +61,22 @@ std::set<SBoardCoords> CMatcher::DoMatch()
 		}
 	}
 }
+
+bool CMatcher::IsMatchPending() const
+{
+	SBoardCoords coords;
+	for (int row = 0; row < mState.GetBoardSize(); row++)
+	{
+		coords.row = row;
+		for (int col = 0; col < mState.GetBoardSize(); col++)
+		{
+			coords.col = col;
+			if (IsMatchInTile(coords))
+			{
+				printf("Match found in (%d, %d)!\n", coords.row, coords.col);
+				return true;
+			}
+		}
+	}
+	return false;
+}
