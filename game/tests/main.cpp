@@ -4,6 +4,7 @@
 #include <CCandy.h>
 #include <CAnimationSystem.h>
 #include <CRefiller.h>
+#include <CMatcher.h>
 #include <CCandyGenerator.h>
 
 int main(int argc, char **argv) {
@@ -11,7 +12,7 @@ int main(int argc, char **argv) {
     return RUN_ALL_TESTS();
 }
 
-TEST(board, check_refill)
+TEST(board, refills_tile)
 {
 	class TestCandyGenerator : public CCandyGenerator
 	{
@@ -31,10 +32,220 @@ TEST(board, check_refill)
 		1, 2, 3, 4, 5, 1, 2, 3,
 		1, 2, 3, 4, 5, 1, 2, 3,
 	};
-	CBoardState boardState(8, 43, 0, 0, std::make_unique<const TestCandyGenerator>());
-	boardState.SetupBoard(testBoard);
-	CAnimationSystem animSys;
-	CRefiller refiller(boardState, animSys);
+	CBoardState board(8, 43, 0, 0, std::make_unique<const TestCandyGenerator>());
+	board.SetupBoard(testBoard);
+	CAnimationSystem animSys; // TODO: can be mocked
+	CRefiller refiller(board, animSys);
+	EXPECT_TRUE(refiller.IsRefillPending());
 	refiller.RefillBoard();
-	EXPECT_EQ(boardState.GetTile({0, 1}).GetCandy()->GetType(), CandyType::BLUE);
+	EXPECT_EQ(board.GetTile({0, 1}).GetCandy()->GetType(), CandyType::BLUE);
+}
+
+TEST(board, no_refill_available)
+{
+	std::vector<int> testBoard = {
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		2, 3, 4, 5, 1, 2, 3, 1,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 3, 5, 1, 2, 3,
+		2, 3, 4, 5, 1, 2, 3, 1,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+	};
+	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
+	board.SetupBoard(testBoard);
+	CAnimationSystem animSys; // TODO: can be mocked
+	CRefiller refiller(board, animSys);
+	EXPECT_FALSE(refiller.IsRefillPending());
+}
+
+TEST(board, no_match_available)
+{
+	std::vector<int> testBoard = {
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		2, 3, 4, 5, 1, 2, 3, 1,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 3, 5, 1, 2, 3,
+		2, 3, 4, 5, 1, 2, 3, 1,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+	};
+	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
+	board.SetupBoard(testBoard);
+	CAnimationSystem animSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys);
+	EXPECT_FALSE(matcher.IsMatchPending());
+}
+
+TEST(board, row_match_triggered)
+{
+	std::vector<int> testBoard = {
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		2, 3, 4, 5, 1, 2, 3, 1,
+		1, 2, 3, 4, 4, 4, 2, 3,
+		1, 2, 3, 3, 5, 1, 2, 3,
+		2, 3, 4, 5, 1, 2, 3, 1,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+	};
+	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
+	board.SetupBoard(testBoard);
+	CAnimationSystem animSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys);
+	EXPECT_TRUE(matcher.IsMatchPending());
+	EXPECT_FALSE(matcher.IsMatchInTile({0, 0}));
+	EXPECT_TRUE(matcher.IsMatchInTile({3, 3}));
+	EXPECT_TRUE(matcher.IsMatchInTile({3, 4}));
+	EXPECT_TRUE(matcher.IsMatchInTile({3, 5}));
+	matcher.DoMatchInTile({3, 3});
+	EXPECT_EQ(board.GetTile({3, 3}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({3, 4}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({3, 5}).GetCandy(), nullptr);
+}
+
+TEST(board, col_match_triggered)
+{
+	std::vector<int> testBoard = {
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		2, 3, 2, 4, 1, 2, 3, 1,
+		1, 2, 3, 2, 5, 1, 2, 3,
+		1, 2, 3, 3, 5, 1, 2, 3,
+		2, 3, 4, 5, 1, 2, 3, 1,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+	};
+	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
+	board.SetupBoard(testBoard);
+	CAnimationSystem animSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys);
+	EXPECT_TRUE(matcher.IsMatchPending());
+	EXPECT_TRUE(matcher.IsMatchInTile({0, 3}));
+	EXPECT_TRUE(matcher.IsMatchInTile({1, 3}));
+	EXPECT_TRUE(matcher.IsMatchInTile({2, 3}));
+	matcher.DoMatchInTile({1, 3});
+	EXPECT_EQ(board.GetTile({0, 3}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({1, 3}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({2, 3}).GetCandy(), nullptr);
+}
+
+TEST(board, t_match_triggered_on_row)
+{
+	std::vector<int> testBoard = {
+		1, 2, 4, 4, 4, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		2, 3, 2, 4, 1, 2, 3, 1,
+		1, 2, 3, 2, 5, 1, 2, 3,
+		1, 2, 3, 3, 5, 1, 2, 3,
+		2, 3, 4, 5, 1, 2, 3, 1,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+	};
+	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
+	board.SetupBoard(testBoard);
+	CAnimationSystem animSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys);
+	EXPECT_TRUE(matcher.IsMatchPending());
+	EXPECT_TRUE(matcher.IsMatchInTile({0, 2}));
+	EXPECT_TRUE(matcher.IsMatchInTile({0, 3}));
+	EXPECT_TRUE(matcher.IsMatchInTile({0, 4}));
+	EXPECT_TRUE(matcher.IsMatchInTile({1, 3}));
+	EXPECT_TRUE(matcher.IsMatchInTile({2, 3}));
+	matcher.DoMatchInTile({0, 4});
+	EXPECT_EQ(board.GetTile({0, 2}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({0, 3}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({0, 4}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({1, 3}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({2, 3}).GetCandy(), nullptr);
+}
+
+TEST(board, t_match_triggered_on_col)
+{
+	std::vector<int> testBoard = {
+		1, 2, 4, 4, 4, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		2, 3, 2, 4, 1, 2, 3, 1,
+		1, 2, 3, 2, 5, 1, 2, 3,
+		1, 2, 3, 3, 5, 1, 2, 3,
+		2, 3, 4, 5, 1, 2, 3, 1,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+	};
+	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
+	board.SetupBoard(testBoard);
+	CAnimationSystem animSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys);
+	EXPECT_TRUE(matcher.IsMatchPending());
+	EXPECT_TRUE(matcher.IsMatchInTile({0, 2}));
+	EXPECT_TRUE(matcher.IsMatchInTile({0, 3}));
+	EXPECT_TRUE(matcher.IsMatchInTile({0, 4}));
+	EXPECT_TRUE(matcher.IsMatchInTile({1, 3}));
+	EXPECT_TRUE(matcher.IsMatchInTile({2, 3}));
+	matcher.DoMatchInTile({2, 3});
+	EXPECT_EQ(board.GetTile({0, 2}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({0, 3}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({0, 4}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({1, 3}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({2, 3}).GetCandy(), nullptr);
+}
+
+TEST(board, row_match_with_neighbour)
+{
+	std::vector<int> testBoard = {
+		1, 2, 5, 5, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		2, 3, 2, 1, 1, 2, 3, 1,
+		1, 2, 3, 2, 5, 1, 2, 3,
+		1, 2, 3, 3, 5, 1, 2, 3,
+		2, 3, 4, 5, 1, 2, 3, 1,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+	};
+	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
+	board.SetupBoard(testBoard);
+	CAnimationSystem animSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys);
+	EXPECT_TRUE(matcher.IsMatchPending());
+	EXPECT_TRUE(matcher.IsMatchInTile({0, 2}));
+	EXPECT_TRUE(matcher.IsMatchInTile({0, 3}));
+	EXPECT_TRUE(matcher.IsMatchInTile({0, 4}));
+	EXPECT_FALSE(matcher.IsMatchInTile({1, 4}));
+	matcher.DoMatchInTile({0, 3});
+	EXPECT_EQ(board.GetTile({0, 2}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({0, 3}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({0, 4}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({1, 4}).GetCandy()->GetType(), CandyType::PURPLE);
+}
+
+TEST(board, col_match_with_neighbour)
+{
+	std::vector<int> testBoard = {
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		2, 3, 4, 5, 2, 2, 3, 1,
+		1, 2, 3, 2, 2, 1, 2, 3,
+		1, 2, 3, 3, 2, 1, 2, 3,
+		2, 3, 4, 5, 1, 2, 3, 1,
+		1, 2, 3, 4, 5, 1, 2, 3,
+		1, 2, 3, 4, 5, 1, 2, 3,
+	};
+	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
+	board.SetupBoard(testBoard);
+	CAnimationSystem animSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys);
+	EXPECT_TRUE(matcher.IsMatchPending());
+	EXPECT_TRUE(matcher.IsMatchInTile({2, 4}));
+	EXPECT_TRUE(matcher.IsMatchInTile({3, 4}));
+	EXPECT_TRUE(matcher.IsMatchInTile({4, 4}));
+	EXPECT_FALSE(matcher.IsMatchInTile({3, 3}));
+	EXPECT_FALSE(matcher.IsMatchInTile({2, 5}));
+	matcher.DoMatchInTile({4, 4});
+	EXPECT_EQ(board.GetTile({2, 4}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({3, 4}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({4, 4}).GetCandy(), nullptr);
+	EXPECT_EQ(board.GetTile({3, 3}).GetCandy()->GetType(), CandyType::GREEN);
+	EXPECT_EQ(board.GetTile({2, 5}).GetCandy()->GetType(), CandyType::GREEN);
 }
