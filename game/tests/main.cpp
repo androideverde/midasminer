@@ -2,6 +2,8 @@
 
 #include <CBoardState.h>
 #include <CCandy.h>
+#include <CAnimationSystem.h>
+#include <CRefiller.h>
 #include <CCandyGenerator.h>
 
 int main(int argc, char **argv) {
@@ -31,6 +33,8 @@ TEST(board, check_refill)
 	};
 	CBoardState boardState(8, 43, 0, 0, std::make_unique<const TestCandyGenerator>());
 	boardState.SetupBoard(testBoard);
-	boardState.Refill();
+	CAnimationSystem animSys;
+	CRefiller refiller(boardState, animSys);
+	refiller.RefillBoard();
 	EXPECT_EQ(boardState.GetTile({0, 1}).GetCandy()->GetType(), CandyType::BLUE);
 }
