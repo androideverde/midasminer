@@ -111,7 +111,7 @@ void CApp::OnMouseMove(int x, int y, int delta_x, int delta_y, bool l_button, bo
 	if (mDragging)
 	{
 		SBoardCoords currentTileCoords = mBoard.GetBoardTileCoords(x, y);
-		if (mTileClickedCoords.row != -1 && currentTileCoords.row != -1)
+		if (mTileClickedCoords.row != -100 && currentTileCoords.row != -100)
 		{
 			if (!(mTileClickedCoords == currentTileCoords))
 			{
@@ -125,7 +125,7 @@ void CApp::OnMouseMove(int x, int y, int delta_x, int delta_y, bool l_button, bo
 void CApp::OnLButtonDown(int x, int y)
 {
 	mTileClickedCoords = mBoard.GetBoardTileCoords(x, y);
-	if (mTileClickedCoords.row != -1)
+	if (mTileClickedCoords.row != -100)
 	{
 		mDragging = true;
 	}
@@ -144,7 +144,7 @@ void CApp::OnButtonUp(int x, int y)
 	if (mDragging)
 	{
 		SBoardCoords currentTileCoords = mBoard.GetBoardTileCoords(x, y);
-		if (mTileClickedCoords.row != -1 && currentTileCoords.row != -1)
+		if (mTileClickedCoords.row != -100 && currentTileCoords.row != -100)
 		{
 			if (mTileClickedCoords == currentTileCoords)
 			{

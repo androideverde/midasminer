@@ -17,19 +17,20 @@ public:
 	~CBoard();
 	void LoadResources(SDL_Renderer* renderer);
 	void Update(float delta_time);
-	void Render(SDL_Renderer* renderer);
+	void Render(SDL_Renderer* renderer) const;
 	SBoardCoords GetBoardTileCoords(int x, int y) const;
+	SDL_Point GetBoardTilePos(SBoardCoords coords) const;
 	void OnClick(SBoardCoords coords);
 	void OnDrag(SBoardCoords startCoords, SBoardCoords endCoords);
 	bool DoSwap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2);
-	bool IsMatchInTile(SBoardCoords coords) const;
-	void DoMatchInTile(SBoardCoords coords);
-	void DoPendingMatches();
+	std::set<SBoardCoords> DoMatch();
 	void TriggerSwapInAnimations(SBoardCoords tile_1, SBoardCoords tile_2);
 	void TriggerSwapOutAnimations(SBoardCoords tile_1, SBoardCoords tile_2);
+	void TriggerFallAnimation(SBoardCoords origin, SBoardCoords destination);
 	void RefillBoard();
-	void MakeCandiesFall(std::map<CCandy*, int> fallingCandies);
-	void AddNewCandies(const std::map<const CCandy*, int>& newCandies);
+	bool IsMatchPending() const;
+	bool IsSwapPending() const;
+	bool IsRefillPending() const;
 
 private:
 	std::map<CandyType, SDL_Texture*> mTextures;

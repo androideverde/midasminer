@@ -27,3 +27,27 @@ void CCandy::SetPos(SDL_Point point)
 {
 	mPoint = point;
 }
+
+std::string CCandy::GetName() const
+{
+	switch (mTileType) {
+		case CandyType::BLUE:
+			return "BLUE";
+			break;
+		case CandyType::GREEN:
+			return "GREEN";
+			break;
+		case CandyType::RED:
+			return "RED";
+			break;
+		case CandyType::YELLOW:
+			return "YELLOW";
+			break;
+		case CandyType::PURPLE:
+			return "PURPLE";
+			break;
+		case CandyType::EMPTY:
+			return "EMPTY";
+			break;
+	}
+}

@@ -10,34 +10,54 @@ CMatcher::CMatcher(CBoardState& state, CAnimationSystem& animationQueue)
 {
 }
 
-void CMatcher::DoMatchInTile(SBoardCoords coords)
+std::set<SBoardCoords> CMatcher::DoMatchInTile(SBoardCoords coords)
 {
 	std::vector<std::unique_ptr<CAnimation>> parallelAnims;
 	std::set<SBoardCoords> matches = mState.GetNeighboursSameAsTile(coords);
 	for (SBoardCoords tileCoords : matches)
 	{
 		CTile& tile = mState.GetTile(tileCoords);
-		CCandy* candy = mState.GetCandy(tileCoords);
-		printf("destroyed candy: (%d, %d) %s\n", tileCoords.row, tileCoords.col, mState.GetTileName(candy->GetType()).c_str());
+		CCandy* candy = tile.GetCandy();
+		printf("destroyed candy: (%d, %d) %s\n", tileCoords.row, tileCoords.col, candy->GetName().c_str());
 		tile.SetCandy(nullptr);
-//		candy->SetType(CandyType::EMPTY);
 		parallelAnims.emplace_back(std::make_unique<CDestroyAnimation>(.2f, candy));
 	}
 	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(.2f, std::move(parallelAnims)));
-
+	return matches;
 }
 
-bool CMatcher::IsMatchInTile(SBoardCoords coords)
+bool CMatcher::IsMatchInTile(SBoardCoords coords) const
 {
 	if (mState.CountRowNeighboursSameAsTile(coords) >= 3)
 	{
-		printf("row match of %s in (%d, %d)!\n", mState.GetTileName(mState.GetCandyType(coords)).c_str(), coords.row, coords.col);
+		printf("row match of %s in (%d, %d)!\n", mState.GetTile(coords).GetCandy()->GetName().c_str(), coords.row, coords.col);
 		return true;
 	}
 	if (mState.CountColNeighboursSameAsTile(coords) >= 3)
 	{
-		printf("col match of %s in (%d, %d)!\n", mState.GetTileName(mState.GetCandyType(coords)).c_str(), coords.row, coords.col);
+		printf("col match of %s in (%d, %d)!\n", mState.GetTile(coords).GetCandy()->GetName().c_str(), coords.row, coords.col);
 		return true;
 	}
 	return false;
+}
+
+std::set<SBoardCoords> CMatcher::DoMatch()
+{
+	SBoardCoords coords;
+	for (int row = 0; row < mState.GetBoardSize(); row++)
+	{
+		coords.row = row;
+		for (int col = 0; col < mState.GetBoardSize(); col++)
+		{
+			coords.col = col;
+			if (mState.GetTile(coords).GetCandy() == nullptr)
+			{
+				continue;
+			}
+			if (IsMatchInTile(coords))
+			{
+				return DoMatchInTile(coords);
+			}
+		}
+	}
 }

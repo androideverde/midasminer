@@ -26,15 +26,19 @@ CBoardState::CBoardState(int size, int tileSize, int originX, int originY, std::
 	mTiles.clear();
 	for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
 	{
-		mTiles.emplace_back(GetCoordsFromIndex(i));
+		mTiles.emplace_back(CTile(GetCoordsFromIndex(i)));
 	}
 	SetupBoard(CBoardStateInternal::SampleBoard);
 }
 
-SDL_Point CBoardState::ResetCandyPos(int index) const
+SDL_Point CBoardState::GetTilePos(int index) const
+{
+	return GetTilePos(GetCoordsFromIndex(index));
+}
+
+SDL_Point CBoardState::GetTilePos(SBoardCoords coords) const
 {
 	SDL_Point point;
-	SBoardCoords coords = GetCoordsFromIndex(index);
 	point.x = coords.col * TILE_SIZE + BOARD_ORIGIN.x;
 	point.y = coords.row * TILE_SIZE + BOARD_ORIGIN.y;
 	return point;
@@ -45,20 +49,18 @@ void CBoardState::SetupBoard(const std::vector<int>& boardDefinition)
 	assert(boardDefinition.size() == mTiles.size());
 	for (int i = 0; i < boardDefinition.size(); i++)
 	{
-		std::unique_ptr<CCandy> candy = std::make_unique<CCandy>(static_cast<CandyType>(boardDefinition[i]), ResetCandyPos(i));
-		mTiles[i].SetCandy(candy.get());
-		mCandies.push_back(std::move(candy));
+		CandyType candyColor = static_cast<CandyType>(boardDefinition[i]);
+		if (candyColor == CandyType::EMPTY)
+		{
+			mTiles[i].SetCandy(nullptr);
+		}
+		else
+		{
+			std::unique_ptr<CCandy> candy = std::make_unique<CCandy>(candyColor, GetTilePos(i));
+			mTiles[i].SetCandy(candy.get());
+			mCandies.push_back(std::move(candy));
+		}
 	}
-}
-
-CandyType CBoardState::GetCandyType(SBoardCoords coords) const
-{
-	return mTiles[GetIndexFromCoords(coords)].GetCandy()->GetType();
-}
-
-CCandy* CBoardState::GetCandy(SBoardCoords coords) const
-{
-	return mTiles[GetIndexFromCoords(coords)].GetCandy();
 }
 
 int CBoardState::GetIndexFromCoords(SBoardCoords coords) const
@@ -77,7 +79,6 @@ SBoardCoords CBoardState::GetCoordsFromIndex(int index) const
 std::vector<int> CBoardState::GetNeighbours(SBoardCoords coords, EDirection direction) const
 {
 	std::vector<int> result;
-	CandyType tile = GetCandyType(coords);
 	int row = coords.row;
 	int col = coords.col;
 	int loopIndex;
@@ -117,8 +118,18 @@ std::vector<int> CBoardState::GetNeighbours(SBoardCoords coords, EDirection dire
 				neighbour = {nextStep, col};
 				break;
 		}
-		CandyType neighbourTile = GetCandyType(neighbour);
-		if (neighbourTile == tile)
+		CCandy* candy = GetTile(coords).GetCandy();
+		CCandy* neighbourCandy = GetTile(neighbour).GetCandy();
+		if (candy == neighbourCandy)
+		{
+			result.push_back(GetIndexFromCoords(neighbour));
+			continue;
+		}
+		if (candy == nullptr || neighbourCandy == nullptr )
+		{
+			break;
+		}
+		if (neighbourCandy->GetType() == candy->GetType())
 		{
 			result.push_back(GetIndexFromCoords(neighbour));
 		}
@@ -154,14 +165,12 @@ std::vector<int> CBoardState::GetColNeighboursSameAsTile(SBoardCoords coords) co
 
 int CBoardState::CountRowNeighboursSameAsTile(SBoardCoords coords) const
 {
-	std::vector<int> neighbours = GetRowNeighboursSameAsTile(coords);
-	return neighbours.size();
+	return GetRowNeighboursSameAsTile(coords).size();
 }
 
 int CBoardState::CountColNeighboursSameAsTile(SBoardCoords coords) const
 {
-	std::vector<int> neighbours = GetColNeighboursSameAsTile(coords);
-	return neighbours.size();
+	return GetColNeighboursSameAsTile(coords).size();
 }
 
 std::set<SBoardCoords> CBoardState::GetNeighboursSameAsTile(SBoardCoords coords) const
@@ -179,87 +188,6 @@ std::set<SBoardCoords> CBoardState::GetNeighboursSameAsTile(SBoardCoords coords)
 	return matchGroup;
 }
 
-std::map<CCandy*, int> CBoardState::GetFallingCandies() const
-{
-	std::map<CCandy*, int> fallingCandies;
-	for (int i = 0; i < BOARD_SIZE; i++)
-	{
-		int row = BOARD_SIZE - 1 - i;
-		for (int col = 0; col < BOARD_SIZE; col++)
-		{
-			CCandy* candy = GetCandy({row, col});
-			//CandyType tile = GetCandyType({row, col});
-			if (candy == nullptr)
-			{
-				printf("found empty tile (%d, %d)\n", row, col);
-				int emptiesInCol = CountColNeighboursSameAsTile({row, col});
-				for (int i = 0; i < row - emptiesInCol; i++)
-				{
-					fallingCandies.insert(std::pair<CCandy*, int>(GetCandy({row - i - emptiesInCol, col}), emptiesInCol));
-				}
-			}
-		}
-	}
-	return fallingCandies;
-}
-
-std::map<std::unique_ptr<CCandy>, int> CBoardState::GenerateNewCandies() const
-{
-	std::map<std::unique_ptr<CCandy>, int> newCandies;
-	// find all empties in the board
-	for (int i = 0; i < BOARD_SIZE; i++)
-	{
-		int row = BOARD_SIZE - 1 - i;
-		for (int col = 0; col < BOARD_SIZE; col++)
-		{
-			CandyType tile = GetCandyType({row, col});
-			if (tile == CandyType::EMPTY)
-			{
-				printf("found empty tile (%d, %d)\n", row, col);
-				int emptiesInCol = CountColNeighboursSameAsTile({row, col});
-				for (int i = 0; i <= emptiesInCol; i++)
-				{
-					CandyType newTile = mCandyGenerator->GenerateCandy();
-					SDL_Point pos = ResetCandyPos(col);
-					pos.y -= TILE_SIZE;
-					std::unique_ptr<CCandy> candy = std::make_unique<CCandy>(newTile, pos);
-					//newCandies.insert({std::move(candy), emptiesInCol - i - 1});
-				}
-			}
-		}
-	}
-	return newCandies;
-}
-
-std::vector<CCandy*> CBoardState::Refill()
-{
-	std::vector<CCandy*> fallingCandies;
-	for (int i = 0; i < BOARD_SIZE; i++)
-	{
-		int row = BOARD_SIZE - 1 - i;
-		for (int col = 0; col < BOARD_SIZE; col++)
-		{
-			CandyType tile = GetCandyType({row, col});
-			if (tile == CandyType::EMPTY)
-			{
-				printf("found empty tile (%d, %d)\n", row, col);
-				//find out how many empties in col
-				//generate as many new candies as needed for that col
-				//shift col down by amount of empties in col
-				//appear new candy + fall to place <-- repeat until all new candies are drawn
-				std::vector<SBoardCoords> fallingTiles = ShiftColumnDown({row, col});
-				AddNewCandy({0, col});
-				fallingTiles.push_back({0, col});
-				for (SBoardCoords coord : fallingTiles)
-				{
-					fallingCandies.push_back(GetCandy(coord));
-				}
-			}
-		}
-	}
-	return fallingCandies;
-}
-
 void CBoardState::Swap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 {
 	int index_1 = GetIndexFromCoords(tileCoords_1);
@@ -268,53 +196,19 @@ void CBoardState::Swap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)
 	CCandy* candy_2 = mTiles[index_2].GetCandy();
 	mTiles[index_1].SetCandy(candy_2);
 	mTiles[index_2].SetCandy(candy_1);
-	printf("swap done! (%d, %d) %s <-> (%d, %d) %s\n", tileCoords_1.row, tileCoords_1.col, GetTileName(candy_1->GetType()).c_str(), tileCoords_2.row, tileCoords_2.col, GetTileName(candy_2->GetType()).c_str());
-}
-
-std::vector<SBoardCoords> CBoardState::ShiftColumnDown(SBoardCoords coords)
-{
-	std::vector<SBoardCoords> fallingTiles;
-	for (int i = 0; i < coords.row; i++)
-	{
-		SBoardCoords current;
-		SBoardCoords above;
-		current.row = coords.row - i;
-		above.row = coords.row - 1 - i;
-		current.col = above.col = coords.col;
-		fallingTiles.push_back(current);
-		Swap(current, above);
-	}
-	return fallingTiles;
+	std::string candyName_1 = candy_1 == nullptr ? "EMPTY" : candy_1->GetName();
+	std::string candyName_2 = candy_2 == nullptr ? "EMPTY" : candy_2->GetName();
+	printf("swap done! (%d, %d) %s <-> (%d, %d) %s\n", tileCoords_1.row, tileCoords_1.col, candyName_1.c_str(), tileCoords_2.row, tileCoords_2.col, candyName_2.c_str());
 }
 
 void CBoardState::AddNewCandy(SBoardCoords coords)
 {
 	CandyType newTile = mCandyGenerator->GenerateCandy();
-	GetCandy(coords)->SetType(newTile);
-	std::string tileName = GetTileName(newTile);
-	printf("refilled (%d, %d) with %s\n", coords.row, coords.col, tileName.c_str());
-}
-
-std::string CBoardState::GetTileName(CandyType tile) const
-{
-	switch (tile) {
-		case CandyType::BLUE:
-			return "BLUE";
-			break;
-		case CandyType::GREEN:
-			return "GREEN";
-			break;
-		case CandyType::RED:
-			return "RED";
-			break;
-		case CandyType::YELLOW:
-			return "YELLOW";
-			break;
-		case CandyType::PURPLE:
-			return "PURPLE";
-			break;
-		case CandyType::EMPTY:
-			return "EMPTY";
-			break;
-	}
+	// the newly created candy is placed in row -1
+	SDL_Point spawnPos = GetTilePos(coords);
+	spawnPos.y -= TILE_SIZE;
+	std::unique_ptr<CCandy> candy = std::make_unique<CCandy>(newTile, spawnPos);
+	GetTile(coords).SetCandy(candy.get());
+	printf("refilled (%d, %d) with %s\n", coords.row, coords.col, candy->GetName().c_str());
+	mCandies.push_back(std::move(candy));
 }

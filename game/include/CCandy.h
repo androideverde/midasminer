@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include <string>
 
 enum class CandyType {
 	EMPTY,
@@ -17,6 +18,7 @@ public:
 	CCandy(CandyType tileType);
 	CCandy(CandyType tileType, SDL_Point pos);
 	CandyType GetType() const { return mTileType; }
+	std::string GetName() const;
 	int GetX() const { return mPoint.x; }
 	int GetY() const { return mPoint.y; }
 	SDL_Point GetPos() const { return mPoint; }

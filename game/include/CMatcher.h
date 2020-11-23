@@ -8,8 +8,9 @@ class CMatcher
 {
 public:
 	CMatcher(CBoardState& state, CAnimationSystem& animationQueue);
-	bool IsMatchInTile(SBoardCoords coords);
-	void DoMatchInTile(SBoardCoords coords);
+	bool IsMatchInTile(SBoardCoords coords) const;
+	std::set<SBoardCoords> DoMatchInTile(SBoardCoords coords);
+	std::set<SBoardCoords> DoMatch();
 private:
 	CBoardState& mState;
 	CAnimationSystem& mAnimationQueue;

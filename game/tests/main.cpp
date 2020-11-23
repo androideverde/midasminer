@@ -32,5 +32,5 @@ TEST(board, check_refill)
 	CBoardState boardState(8, 43, 0, 0, std::make_unique<const TestCandyGenerator>());
 	boardState.SetupBoard(testBoard);
 	boardState.Refill();
-	EXPECT_EQ(boardState.GetCandy({0, 1})->GetType(), CandyType::BLUE);
+	EXPECT_EQ(boardState.GetTile({0, 1}).GetCandy()->GetType(), CandyType::BLUE);
 }

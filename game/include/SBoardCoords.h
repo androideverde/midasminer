@@ -1,8 +1,8 @@
 #pragma once
 
 struct SBoardCoords {
-	int row = -1;
-	int col = -1;
+	int row = -100;
+	int col = -100;
 	bool operator==(const SBoardCoords& comp) const
 	{
 		return row == comp.row && col == comp.col;

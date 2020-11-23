@@ -10,7 +10,6 @@ public:
 	void Update(float delta_time) override;
 	SDL_Point GetStart() const { return mPositionStart; }
 	SDL_Point GetEnd() const { return mPositionEnd; }
-	CCandy* GetCandy() { return mCandy; }
 private:
 	SDL_Point mPositionStart;
 	SDL_Point mPositionEnd;
