@@ -13,7 +13,7 @@ CMatcher::CMatcher(CBoardState& state, CAnimationSystem& animationQueue)
 std::set<SBoardCoords> CMatcher::DoMatchInTile(SBoardCoords coords)
 {
 	std::vector<std::unique_ptr<CAnimation>> parallelAnims;
-	std::set<SBoardCoords> matches = mState.GetNeighboursSameAsTile(coords);
+	std::set<SBoardCoords> matches = GetMatchGroup(coords);
 	for (SBoardCoords tileCoords : matches)
 	{
 		CTile& tile = mState.GetTile(tileCoords);
@@ -24,6 +24,22 @@ std::set<SBoardCoords> CMatcher::DoMatchInTile(SBoardCoords coords)
 	}
 	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(.2f, std::move(parallelAnims)));
 	return matches;
+}
+
+std::set<SBoardCoords> CMatcher::GetMatchGroup(SBoardCoords coords)
+{
+	std::set<SBoardCoords> result;
+	std::set<SBoardCoords> initial = mState.GetNeighboursSameAsTile(coords);
+	result.insert(initial.begin(), initial.end());
+	for (SBoardCoords coord: initial)
+	{
+		std::set<SBoardCoords> partial = mState.GetNeighboursSameAsTile(coord);
+		if (partial.size() >= initial.size() + 2)
+		{
+			result.insert(partial.begin(), partial.end());
+		}
+	}
+	return result;
 }
 
 bool CMatcher::IsMatchInTile(SBoardCoords coords) const
