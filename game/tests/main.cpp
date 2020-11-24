@@ -302,7 +302,7 @@ TEST(board, col_match_with_neighbour)
 	EXPECT_TRUE(matcher.IsMatchInTile({4, 4}));
 	EXPECT_FALSE(matcher.IsMatchInTile({3, 3}));
 	EXPECT_FALSE(matcher.IsMatchInTile({2, 5}));
-	matcher.DoMatchInTile({4, 4});
+	matcher.DoMatchInTile({2, 4});
 	EXPECT_EQ(board.GetTile({2, 4}).GetCandy(), nullptr);
 	EXPECT_EQ(board.GetTile({3, 4}).GetCandy(), nullptr);
 	EXPECT_EQ(board.GetTile({4, 4}).GetCandy(), nullptr);

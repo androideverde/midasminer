@@ -19,7 +19,7 @@ public:
 	CTile& GetTile(SBoardCoords coords) { return mTiles[GetIndexFromCoords(coords)]; }
 	int CountRowNeighboursSameAsTile(SBoardCoords coords) const;
 	int CountColNeighboursSameAsTile(SBoardCoords coords) const;
-	std::set<SBoardCoords> GetNeighboursSameAsTile(SBoardCoords coords) const;
+	std::set<SBoardCoords> GetMatchedNeighboursSameAsTile(SBoardCoords coords) const;
 	std::vector<CCandy*> Refill();
 	void Swap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2);
 	int GetBoardSize() const { return BOARD_SIZE; }

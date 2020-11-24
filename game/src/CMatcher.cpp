@@ -29,11 +29,11 @@ std::set<SBoardCoords> CMatcher::DoMatchInTile(SBoardCoords coords)
 std::set<SBoardCoords> CMatcher::GetMatchGroup(SBoardCoords coords)
 {
 	std::set<SBoardCoords> result;
-	std::set<SBoardCoords> initial = mState.GetNeighboursSameAsTile(coords);
+	std::set<SBoardCoords> initial = mState.GetMatchedNeighboursSameAsTile(coords);
 	result.insert(initial.begin(), initial.end());
 	for (SBoardCoords coord: initial)
 	{
-		std::set<SBoardCoords> partial = mState.GetNeighboursSameAsTile(coord);
+		std::set<SBoardCoords> partial = mState.GetMatchedNeighboursSameAsTile(coord);
 		if (partial.size() >= initial.size() + 2)
 		{
 			result.insert(partial.begin(), partial.end());

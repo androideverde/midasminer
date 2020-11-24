@@ -173,12 +173,26 @@ int CBoardState::CountColNeighboursSameAsTile(SBoardCoords coords) const
 	return GetColNeighboursSameAsTile(coords).size();
 }
 
-std::set<SBoardCoords> CBoardState::GetNeighboursSameAsTile(SBoardCoords coords) const
+std::set<SBoardCoords> CBoardState::GetMatchedNeighboursSameAsTile(SBoardCoords coords) const
 {
 	std::vector<int> matchInRow = GetRowNeighboursSameAsTile(coords);
 	std::vector<int> matchInCol = GetColNeighboursSameAsTile(coords);
 	std::vector<int> merged;
-	std::merge(matchInRow.begin(), matchInRow.end(), matchInCol.begin(), matchInCol.end(), std::back_inserter(merged));
+	if (matchInRow.size() >= 3 && matchInCol.size() >= 3)
+	{
+		std::merge(matchInRow.begin(), matchInRow.end(), matchInCol.begin(), matchInCol.end(), std::back_inserter(merged));
+	}
+	else
+	{
+		if (matchInRow.size() >= 3)
+		{
+			merged = matchInRow;
+		}
+		else
+		{
+			merged = matchInCol;
+		}
+	}
 	std::sort(merged.begin(), merged.end());
 	std::set<SBoardCoords> matchGroup;
 	for (int index : merged)
