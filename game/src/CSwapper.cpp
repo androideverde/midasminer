@@ -29,9 +29,9 @@ void CSwapper::TriggerSwapInAnimations(SBoardCoords tile_1, SBoardCoords tile_2)
 	CCandy* candy_1 = mState.GetTile(tile_1).GetCandy();
 	CCandy* candy_2 = mState.GetTile(tile_2).GetCandy();
 	std::vector<std::unique_ptr<CAnimation>> parallelAnims;
-	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(candy_1->GetPos(), candy_2->GetPos(), .4f, candy_1));
-	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(candy_2->GetPos(), candy_1->GetPos(), .4f, candy_2));
-	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(.4f, std::move(parallelAnims)));
+	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(candy_1->GetPos(), candy_2->GetPos(), .2f, candy_1));
+	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(candy_2->GetPos(), candy_1->GetPos(), .2f, candy_2));
+	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(.2f, std::move(parallelAnims)));
 }
 
 void CSwapper::TriggerSwapOutAnimations(SBoardCoords tile_1, SBoardCoords tile_2)
@@ -39,7 +39,7 @@ void CSwapper::TriggerSwapOutAnimations(SBoardCoords tile_1, SBoardCoords tile_2
 	CCandy* candy_1 = mState.GetTile(tile_2).GetCandy();
 	CCandy* candy_2 = mState.GetTile(tile_1).GetCandy();
 	std::vector<std::unique_ptr<CAnimation>> parallelAnims;
-	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(candy_1->GetPos(), candy_2->GetPos(), .4f, candy_2));
-	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(candy_2->GetPos(), candy_1->GetPos(), .4f, candy_1));
-	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(.4f, std::move(parallelAnims)));
+	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(candy_1->GetPos(), candy_2->GetPos(), .2f, candy_2));
+	parallelAnims.emplace_back(std::make_unique<CMoveAnimation>(candy_2->GetPos(), candy_1->GetPos(), .2f, candy_1));
+	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(.2f, std::move(parallelAnims)));
 }

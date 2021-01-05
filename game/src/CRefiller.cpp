@@ -62,7 +62,7 @@ void CRefiller::RefillBoard()
 				if (above.row != -100 && above.col != -100)
 				{
 					TriggerFallAnimation(above, coords);
-					mState.Swap(coords, above);
+					mState.Swap(above, coords);
 					emptiesInCol[col]--;
 				}
 			}
@@ -86,5 +86,5 @@ void CRefiller::RefillBoard()
 void CRefiller::TriggerFallAnimation(SBoardCoords origin, SBoardCoords destination)
 {
 	CCandy* candy = mState.GetTile(origin).GetCandy();
-	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(candy->GetPos(), mState.GetTilePos(destination), .3f, candy));
+	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(candy->GetPos(), mState.GetTilePos(destination), .2f, candy));
 }
