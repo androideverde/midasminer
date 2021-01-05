@@ -31,13 +31,29 @@ std::set<SBoardCoords> CMatcher::GetMatchGroup(SBoardCoords coords)
 	std::set<SBoardCoords> result;
 	std::set<SBoardCoords> initial = mState.GetMatchedNeighboursSameAsTile(coords);
 	result.insert(initial.begin(), initial.end());
+	std::set<SBoardCoords> recursive;
+	recursive = GetMatchesRecursively(initial);
+	result.insert(recursive.begin(), recursive.end());
+	return result;
+}
+
+std::set<SBoardCoords> CMatcher::GetMatchesRecursively(std::set<SBoardCoords> initial)
+{
+	std::set<SBoardCoords> result;
+	bool goDeeper = false;
 	for (SBoardCoords coord: initial)
 	{
 		std::set<SBoardCoords> partial = mState.GetMatchedNeighboursSameAsTile(coord);
 		if (partial.size() >= initial.size() + 2)
 		{
 			result.insert(partial.begin(), partial.end());
+			goDeeper = true;
 		}
+	}
+	if (goDeeper)
+	{
+		initial = result;
+		result = GetMatchesRecursively(initial);
 	}
 	return result;
 }

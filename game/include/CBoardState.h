@@ -19,8 +19,8 @@ public:
 	CTile& GetTile(SBoardCoords coords) { return mTiles[GetIndexFromCoords(coords)]; }
 	int CountRowNeighboursSameAsTile(SBoardCoords coords) const;
 	int CountColNeighboursSameAsTile(SBoardCoords coords) const;
-	std::set<SBoardCoords> GetMatchedNeighboursSameAsTile(SBoardCoords coords) const;
-	std::vector<CCandy*> Refill();
+	std::set<SBoardCoords> GetMatchedNeighboursSameAsTile(SBoardCoords coords);
+	std::set<SBoardCoords> KeepCollectingNeighbours(const std::set<SBoardCoords>& list, const std::string& orientation, std::set<SBoardCoords>& result);
 	void Swap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2);
 	int GetBoardSize() const { return BOARD_SIZE; }
 	SDL_Point GetTilePos(int index) const;

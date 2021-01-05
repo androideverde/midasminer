@@ -312,29 +312,20 @@ TEST(board, col_match_with_neighbour)
 
 TEST(board, extreme_match)
 {
-	class TestCandyGenerator : public CCandyGenerator
-	{
-	public:
-		CandyType GenerateCandy() const override
-		{
-			return CandyType::BLUE;
-		}
-	};
+	// board state is coming from a refill of a previous match in 0,2 - 4,2 that has been refilled with color 1
 	std::vector<int> testBoard = {
-		1, 1, 0, 1, 1, 2, 2, 3,
-		1, 1, 0, 1, 1, 3, 2, 3,
-		2, 3, 0, 5, 4, 2, 3, 1,
-		1, 1, 0, 1, 1, 4, 2, 3,
-		1, 1, 0, 1, 1, 5, 2, 3,
+		1, 1, 1, 1, 1, 2, 2, 3,
+		1, 1, 1, 1, 1, 3, 2, 3,
+		2, 3, 1, 5, 4, 2, 3, 1,
+		1, 1, 1, 1, 1, 4, 2, 3,
+		1, 1, 1, 1, 1, 5, 2, 3,
 		2, 3, 1, 5, 4, 2, 3, 1,
 		1, 2, 1, 2, 1, 3, 2, 3,
 		1, 2, 3, 4, 5, 1, 2, 3,
 	};
-	CBoardState board(8, 43, 0, 0, std::make_unique<TestCandyGenerator>());
+	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>());
 	board.SetupBoard(testBoard);
 	CAnimationSystem animSys; // TODO: can be mocked
-	CRefiller refiller(board, animSys);
-	refiller.RefillBoard();
 	CMatcher matcher(board, animSys);
 	matcher.DoMatch();
 	EXPECT_EQ(board.GetTile({0, 0}).GetCandy(), nullptr);

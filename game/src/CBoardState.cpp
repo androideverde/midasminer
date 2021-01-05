@@ -146,7 +146,6 @@ std::vector<int> CBoardState::GetRowNeighboursSameAsTile(SBoardCoords coords) co
 	std::vector<int> left = GetNeighbours(coords, CBoardState::EDirection::LEFT);
 	std::vector<int> right = GetNeighbours(coords, CBoardState::EDirection::RIGHT);
 	std::vector<int> result;
-	result.push_back(GetIndexFromCoords(coords));
 	std::merge(left.begin(), left.end(), right.begin(), right.end(), std::back_inserter(result));
 	std::sort(result.begin(), result.end());
 	return result;
@@ -157,7 +156,6 @@ std::vector<int> CBoardState::GetColNeighboursSameAsTile(SBoardCoords coords) co
 	std::vector<int> top = GetNeighbours(coords, CBoardState::EDirection::UP);
 	std::vector<int> bottom = GetNeighbours(coords, CBoardState::EDirection::DOWN);
 	std::vector<int> result;
-	result.push_back(GetIndexFromCoords(coords));
 	std::merge(top.begin(), top.end(), bottom.begin(), bottom.end(), std::back_inserter(result));
 	std::sort(result.begin(), result.end());
 	return result;
@@ -165,41 +163,65 @@ std::vector<int> CBoardState::GetColNeighboursSameAsTile(SBoardCoords coords) co
 
 int CBoardState::CountRowNeighboursSameAsTile(SBoardCoords coords) const
 {
-	return GetRowNeighboursSameAsTile(coords).size();
+	return GetRowNeighboursSameAsTile(coords).size() + 1;
 }
 
 int CBoardState::CountColNeighboursSameAsTile(SBoardCoords coords) const
 {
-	return GetColNeighboursSameAsTile(coords).size();
+	return GetColNeighboursSameAsTile(coords).size() + 1;
 }
 
-std::set<SBoardCoords> CBoardState::GetMatchedNeighboursSameAsTile(SBoardCoords coords) const
+std::set<SBoardCoords> CBoardState::KeepCollectingNeighbours(const std::set<SBoardCoords>& list, const std::string& orientation, std::set<SBoardCoords>& result)
 {
+	for (SBoardCoords matchCoord : list)
+	{
+		std::vector<int> matchInOrientation = orientation == "row" ? GetRowNeighboursSameAsTile(matchCoord) : GetColNeighboursSameAsTile(matchCoord);
+		std::string next_orientation = orientation == "row" ? "col" : "row";
+		if (matchInOrientation.size() >= 2)
+		{
+			std::set<SBoardCoords> matchCoords;
+			for (int index : matchInOrientation)
+			{
+				matchCoords.insert(GetCoordsFromIndex(index));
+			}
+			result.insert(matchCoords.begin(), matchCoords.end());
+			std::set<SBoardCoords> neighbourCoords = KeepCollectingNeighbours(matchCoords, next_orientation, result);
+			result.insert(neighbourCoords.begin(), neighbourCoords.end());
+		}
+	}
+	return result;
+}
+
+std::set<SBoardCoords> CBoardState::GetMatchedNeighboursSameAsTile(SBoardCoords coords)
+{
+	std::set<SBoardCoords> result;
 	std::vector<int> matchInRow = GetRowNeighboursSameAsTile(coords);
 	std::vector<int> matchInCol = GetColNeighboursSameAsTile(coords);
-	std::vector<int> merged;
-	if (matchInRow.size() >= 3 && matchInCol.size() >= 3)
+	if (matchInRow.size() >= 2)
 	{
-		std::merge(matchInRow.begin(), matchInRow.end(), matchInCol.begin(), matchInCol.end(), std::back_inserter(merged));
-	}
-	else
-	{
-		if (matchInRow.size() >= 3)
+		std::set<SBoardCoords> matches;
+		matches.insert(coords);
+		for (int index : matchInRow)
 		{
-			merged = matchInRow;
+			matches.insert(GetCoordsFromIndex(index));
 		}
-		else
-		{
-			merged = matchInCol;
-		}
+		result.insert(matches.begin(), matches.end());
+		std::set<SBoardCoords> neighbourCoords = KeepCollectingNeighbours(matches, "col", result);
+		result.insert(neighbourCoords.begin(), neighbourCoords.end());
 	}
-	std::sort(merged.begin(), merged.end());
-	std::set<SBoardCoords> matchGroup;
-	for (int index : merged)
+	else if (matchInCol.size() >= 2)
 	{
-		matchGroup.insert(GetCoordsFromIndex(index));
+		std::set<SBoardCoords> matches;
+		matches.insert(coords);
+		for (int index : matchInCol)
+		{
+			matches.insert(GetCoordsFromIndex(index));
+		}
+		result.insert(matches.begin(), matches.end());
+		std::set<SBoardCoords> neighbourCoords = KeepCollectingNeighbours(matches, "row", result);
+		result.insert(neighbourCoords.begin(), neighbourCoords.end());
 	}
-	return matchGroup;
+	return result;
 }
 
 void CBoardState::Swap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2)

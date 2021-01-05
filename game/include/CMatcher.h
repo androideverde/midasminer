@@ -16,4 +16,5 @@ public:
 private:
 	CBoardState& mState;
 	CAnimationSystem& mAnimationQueue;
+	std::set<SBoardCoords> GetMatchesRecursively(std::set<SBoardCoords> initial);
 };
