@@ -6,15 +6,12 @@
 class CAnimation
 {
 public:
-	CAnimation(float duration);
+	CAnimation() = default;
+	CAnimation(float speed);
 	virtual ~CAnimation() = default;
 	virtual void Update(float delta_time) = 0;
-	float GetDuration() const { return mDuration; }
 	bool IsCompleted() const { return mCompleted; }
 protected:
-	float mDuration;
-	float mElapsed;
-	bool mCompleted;
-	float GetElapsed() const { return mElapsed; }
-	void SetElapsed(float value) { mElapsed = value; }
+	float mSpeed = 0.f;
+	bool mCompleted = false;
 };

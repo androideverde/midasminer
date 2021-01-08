@@ -1,15 +1,15 @@
 #include <CDestroyAnimation.h>
 
-CDestroyAnimation::CDestroyAnimation(float duration, CCandy* candy)
+CDestroyAnimation::CDestroyAnimation(float speed, CCandy* candy)
 	: mCandy(candy)
-	, CAnimation(duration)
+	, CAnimation(speed)
 {
 }
 
 void CDestroyAnimation::Update(float delta_time)
 {
-	mElapsed += delta_time;
-	if (mElapsed >= mDuration)
+	mCount++;
+	if (mCount == mSpeed)
 	{
 		mCompleted = true;
 	}

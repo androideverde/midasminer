@@ -86,5 +86,5 @@ void CRefiller::RefillBoard()
 void CRefiller::TriggerFallAnimation(SBoardCoords origin, SBoardCoords destination)
 {
 	CCandy* candy = mState.GetTile(origin).GetCandy();
-	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(candy->GetPos(), mState.GetTilePos(destination), .2f, candy));
+	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(candy->GetPos(), mState.GetTilePos(destination), 700.f, candy));
 }

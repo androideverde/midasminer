@@ -1,8 +1,7 @@
 #include <CParallelAnimation.h>
 
-CParallelAnimation::CParallelAnimation(float duration, std::vector<std::unique_ptr<CAnimation>> parallelAnimations)
-	: CAnimation(duration)
-	, mAnimations(std::move(parallelAnimations))
+CParallelAnimation::CParallelAnimation(std::vector<std::unique_ptr<CAnimation>> parallelAnimations)
+	: mAnimations(std::move(parallelAnimations))
 {
 }
 

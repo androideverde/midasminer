@@ -2,33 +2,56 @@
 
 #include <cassert>
 
-CMoveAnimation::CMoveAnimation(SDL_Point start, SDL_Point end, float duration, CCandy* candy)
+CMoveAnimation::CMoveAnimation(SDL_Point start, SDL_Point end, float speed, CCandy* candy)
 	: mPositionStart(start)
 	, mPositionEnd(end)
 	, mCandy(candy)
-	, CAnimation(duration)
+	, CAnimation(speed)
 {
 }
 
 void CMoveAnimation::Update(float delta_time)
 {
-	float timeStep;
-	int moveStepX;
-	int moveStepY;
-	SDL_Point pos;
-	assert(mElapsed < mDuration);
-	timeStep = delta_time / (mDuration - mElapsed);
-	pos = mPositionStart;
-	moveStepX = (mPositionEnd.x - pos.x) * timeStep;
-	moveStepY = (mPositionEnd.y - pos.y) * timeStep;
-	pos.x += moveStepX;
-	pos.y += moveStepY;
-	mCandy->SetPos(pos);
-	mElapsed += delta_time;
-	if (mElapsed >= mDuration)
+	SDL_Point oldPos = mCandy->GetPos();
+	SDL_Point newPos;
+	float deltaX = mPositionEnd.x - mPositionStart.x;
+	float deltaY = mPositionEnd.y - mPositionStart.y;
+	float speed;
+	if (deltaX == 0)
 	{
-		mCompleted = true;
+		newPos.x = oldPos.x;
+		speed = deltaY > 0 ? mSpeed : -mSpeed;
+		newPos.y = UpdatePos(delta_time, oldPos.y, speed);
+		mCompleted = IsMoveComplete(oldPos.y, newPos.y, mPositionEnd.y);
+	}
+	if (deltaY == 0)
+	{
+		newPos.y = oldPos.y;
+		speed = deltaX > 0 ? mSpeed : -mSpeed;
+		newPos.x = UpdatePos(delta_time, oldPos.x, speed);
+		mCompleted = IsMoveComplete(oldPos.x, newPos.x, mPositionEnd.x);
+	}
+	if (mCompleted)
+	{
 		mCandy->SetPos(mPositionEnd);
 		printf("move anim done! (%d, %d) -> (%d, %d) %d\n", mPositionStart.x, mPositionStart.y, mPositionEnd.x, mPositionEnd.y, mCandy->GetType());
 	}
+	else
+	{
+		mCandy->SetPos(newPos);
+	}
+}
+
+int CMoveAnimation::UpdatePos(float delta_time, int oldPos, float speed) const
+{
+	return oldPos + speed * delta_time;
+}
+
+bool CMoveAnimation::IsMoveComplete(int oldPos, int newPos, int endPos) const
+{
+	if ((oldPos - endPos) * (newPos - endPos) <= 0)
+	{
+		return true;
+	}
+	return false;
 }

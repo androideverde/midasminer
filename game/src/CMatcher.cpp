@@ -20,9 +20,9 @@ std::set<SBoardCoords> CMatcher::DoMatchInTile(SBoardCoords coords)
 		CCandy* candy = tile.GetCandy();
 		printf("destroyed candy: (%d, %d) %s\n", tileCoords.row, tileCoords.col, candy->GetName().c_str());
 		tile.SetCandy(nullptr);
-		parallelAnims.emplace_back(std::make_unique<CDestroyAnimation>(.2f, candy));
+		parallelAnims.emplace_back(std::make_unique<CDestroyAnimation>(10.f, candy));
 	}
-	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(.2f, std::move(parallelAnims)));
+	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(std::move(parallelAnims)));
 	return matches;
 }
 

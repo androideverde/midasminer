@@ -1,8 +1,7 @@
 #include <CAnimation.h>
 
-CAnimation::CAnimation(float duration)
-	: mDuration(duration)
-	, mElapsed(0.f)
+CAnimation::CAnimation(float speed)
+	: mSpeed(speed)
 	, mCompleted(false)
 {
 }
