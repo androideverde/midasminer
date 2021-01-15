@@ -38,4 +38,6 @@ private:
 	SBoardCoords mSwappedTileCoords_1;
 	SBoardCoords mSwappedTileCoords_2;
 	CAnimationSystem mAnimationQueue;
+	void RenderTime(SDL_Renderer* renderer, int secondsLeft) const;
+	void RenderScore(SDL_Renderer* renderer, int score) const;
 };

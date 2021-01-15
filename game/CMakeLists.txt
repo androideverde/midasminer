@@ -16,6 +16,10 @@ target_link_libraries(${PROJECT_NAME} /Library/Frameworks/SDL2.framework/SDL2)
 include_directories(/Library/Frameworks/SDL2_image.framework/Headers)
 target_link_libraries(${PROJECT_NAME} /Library/Frameworks/SDL2_image.framework/SDL2_image)
 
+# add SDL_ttf library dependency
+include_directories(/Library/Frameworks/SDL2_ttf.framework/Headers)
+target_link_libraries(${PROJECT_NAME} /Library/Frameworks/SDL2_ttf.framework/SDL2_ttf)
+
 # add the sources
 file(GLOB project_files "src/*.cpp" "include/*.h")
 target_sources(${PROJECT_NAME} PRIVATE ${project_files})

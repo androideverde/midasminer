@@ -22,6 +22,22 @@ SDL_Texture* Utils::LoadImage(const std::string& file_str, SDL_Renderer* rendere
 	return tex;
 }
 
+SDL_Texture* Utils::LoadText(const std::string &text_str, SDL_Renderer* renderer)
+{
+	TTF_Font* font = TTF_OpenFont("../assets/Impact.ttf", 28);
+	SDL_Color textColor = {0, 0, 0};
+	SDL_Surface* surf = TTF_RenderText_Solid(font, text_str.c_str(), textColor);
+	if (surf == nullptr)
+	{
+		printf( "Unable to render text %s! SDL Error: %s\n", text_str.c_str(), TTF_GetError() );
+		return nullptr;
+	}
+	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
+	SDL_FreeSurface(surf);
+	surf = nullptr;
+	return tex;
+}
+
 int Utils::GetRandomIntFromVector(const std::vector<int> list)
 {
 	std::random_device rd;

@@ -68,6 +68,10 @@ bool CApp::OnInit()
 	{
 		return false;
 	}
+	if (TTF_Init() == -1)
+	{
+		return false;
+	}
 	mWindow = SDL_CreateWindow("SDL Tutorial", 0, 0, 755, 600, SDL_WINDOW_SHOWN);
 	if (mWindow == nullptr)
 	{

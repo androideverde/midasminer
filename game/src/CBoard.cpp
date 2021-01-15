@@ -107,6 +107,9 @@ SBoardCoords CBoard::GetBoardTileCoords(int x, int y) const
 
 void CBoard::Render(SDL_Renderer* renderer) const
 {
+	RenderTime(renderer, 0);
+	RenderScore(renderer, 0);
+	
 	SDL_Rect rect = {0, 0, 0, 0};
 
 	for (int row = 0; row < BOARD_SIZE; row++)
@@ -124,4 +127,20 @@ void CBoard::Render(SDL_Renderer* renderer) const
 			}
 		}
 	}
+}
+
+void CBoard::RenderTime(SDL_Renderer* renderer, int secondsLeft) const
+{
+	char secondsLeft_str[4];
+	sprintf(secondsLeft_str, "0:%02d", secondsLeft);
+	SDL_Rect textPosition = {80, 430, 75, 30};
+	SDL_RenderCopy(renderer, Utils::LoadText(secondsLeft_str, renderer), nullptr, &textPosition);
+}
+
+void CBoard::RenderScore(SDL_Renderer* renderer, int score) const
+{
+	char score_str[5];
+	sprintf(score_str, "%05d", score);
+	SDL_Rect textPosition = {80, 468, 75, 30};
+	SDL_RenderCopy(renderer, Utils::LoadText(score_str, renderer), nullptr, &textPosition);
 }
