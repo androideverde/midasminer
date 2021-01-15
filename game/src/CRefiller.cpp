@@ -42,28 +42,33 @@ void CRefiller::RefillBoard()
 		emptiesInCol.push_back(0);
 		for (int rowIndex = 0; rowIndex < mState.GetBoardSize(); rowIndex++)
 		{
+			// check from bottom up
 			coords.row = mState.GetBoardSize() - 1 - rowIndex;
 			if (mState.GetTile(coords).GetCandy() == nullptr)
 			{
 				printf("Empty found in (%d, %d)\n", coords.row, coords.col);
 				emptiesInCol[col]++;
-				SBoardCoords above;
-				// find first non-empty tile going up in column
-				for (int i = 1; i < coords.row + 1; i++)
+				if (coords.row == 0)
 				{
-					if (mState.GetTile({coords.row - i, col}).GetCandy() != nullptr)
-					{
-						above = {coords.row - i, col};
-						printf("Will fill (%d, %d) with (%d, %d)\n", coords.row, coords.col, above.row, above.col);
-						break;
-					}
+					// nothing is above, we're done
+					continue;
 				}
-				// above is the first non-empty tile or (-100,-100) if there's nothing above
-				if (above.row != -100 && above.col != -100)
+				else
 				{
-					TriggerFallAnimation(above, coords);
-					mState.Swap(above, coords);
-					emptiesInCol[col]--;
+					SBoardCoords above;
+					// find first non-empty tile going up in column
+					for (int i = 1; i < coords.row + 1; i++)
+					{
+						if (mState.GetTile({coords.row - i, col}).GetCandy() != nullptr)
+						{
+							above = {coords.row - i, col};
+							printf("Will fill (%d, %d) with (%d, %d)\n", coords.row, coords.col, above.row, above.col);
+							TriggerFallAnimation(above, coords);
+							mState.Swap(above, coords);
+							emptiesInCol[col]--;
+							break;
+						}
+					}
 				}
 			}
 		}
