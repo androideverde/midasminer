@@ -46,6 +46,7 @@ CBoard::~CBoard()
 	{
 		SDL_DestroyTexture(it.second);
 	}
+	TTF_CloseFont(mFont);
 }
 
 void CBoard::OnClick(SBoardCoords coords)
