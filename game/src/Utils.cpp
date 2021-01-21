@@ -22,9 +22,8 @@ SDL_Texture* Utils::LoadImage(const std::string& file_str, SDL_Renderer* rendere
 	return tex;
 }
 
-SDL_Texture* Utils::LoadText(const std::string &text_str, SDL_Renderer* renderer)
+SDL_Texture* Utils::LoadText(const std::string &text_str, TTF_Font* font, SDL_Renderer* renderer)
 {
-	TTF_Font* font = TTF_OpenFont("../assets/Impact.ttf", 28);
 	SDL_Color textColor = {0, 0, 0};
 	SDL_Surface* surf = TTF_RenderText_Solid(font, text_str.c_str(), textColor);
 	if (surf == nullptr)

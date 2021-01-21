@@ -25,10 +25,12 @@ void CBoard::LoadResources(SDL_Renderer* renderer)
 	{
 		mTextures.insert({it.first, Utils::LoadImage(it.second, renderer)});
 	}
+	mFont = TTF_OpenFont("../assets/Impact.ttf", 28);
 }
 
 CBoard::CBoard()
 	: mBoardState(BOARD_SIZE, TILE_SIZE, ORIGIN_X, ORIGIN_Y, std::make_unique<const CCandyGenerator>())
+	, mFont(nullptr)
 	, mAnimationQueue()
 	, mMatcher(mBoardState, mAnimationQueue)
 	, mSwapper(mBoardState, mAnimationQueue, mMatcher)
@@ -134,7 +136,7 @@ void CBoard::RenderTime(SDL_Renderer* renderer, int secondsLeft) const
 	char secondsLeft_str[4];
 	sprintf(secondsLeft_str, "0:%02d", secondsLeft);
 	SDL_Rect textPosition = {80, 430, 75, 30};
-	SDL_RenderCopy(renderer, Utils::LoadText(secondsLeft_str, renderer), nullptr, &textPosition);
+	SDL_RenderCopy(renderer, Utils::LoadText(secondsLeft_str, mFont, renderer), nullptr, &textPosition);
 }
 
 void CBoard::RenderScore(SDL_Renderer* renderer, int score) const
@@ -142,5 +144,5 @@ void CBoard::RenderScore(SDL_Renderer* renderer, int score) const
 	char score_str[5];
 	sprintf(score_str, "%05d", score);
 	SDL_Rect textPosition = {80, 468, 75, 30};
-	SDL_RenderCopy(renderer, Utils::LoadText(score_str, renderer), nullptr, &textPosition);
+	SDL_RenderCopy(renderer, Utils::LoadText(score_str, mFont, renderer), nullptr, &textPosition);
 }

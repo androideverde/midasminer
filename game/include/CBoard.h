@@ -8,6 +8,7 @@
 #include <CAnimationSystem.h>
 #include <CCandy.h>
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <set>
 #include <map>
 #include <vector>
@@ -31,6 +32,7 @@ private:
 	const int ORIGIN_X = 330; // board top left is at (330, 100) of the BackGround.jpg image
 	const int ORIGIN_Y = 100;
 	const int BOARD_SIZE = 8; // board is 8x8 tiles
+	TTF_Font* mFont;
 	CBoardState mBoardState;
 	CMatcher mMatcher;
 	CSwapper mSwapper;
