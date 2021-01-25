@@ -44,7 +44,8 @@ void CMoveAnimation::Update(float delta_time)
 
 int CMoveAnimation::UpdatePos(float delta_time, int oldPos, float speed) const
 {
-	return oldPos + speed * delta_time;
+	float result = oldPos + speed * delta_time;
+	return result;
 }
 
 bool CMoveAnimation::IsMoveComplete(int oldPos, int newPos, int endPos) const

@@ -10,9 +10,11 @@ public:
 	CRefiller(CBoardState& state, CAnimationSystem& animationQueue);
 	bool IsRefillPending() const;
 	void RefillBoard();
-	void TriggerFallAnimation(SBoardCoords origin, SBoardCoords destination);
+	void TriggerFallAnimation(SBoardCoords origin, SBoardCoords destination, CCandy* candy);
 private:
 	CBoardState& mState;
 	CAnimationSystem& mAnimationQueue;
+	std::vector<std::unique_ptr<CAnimation>> mParallelAnims;
+	void FlushBlockAnimation();
 };
 

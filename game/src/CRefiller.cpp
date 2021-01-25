@@ -63,7 +63,7 @@ void CRefiller::RefillBoard()
 						{
 							above = {coords.row - i, col};
 							printf("Will fill (%d, %d) with (%d, %d)\n", coords.row, coords.col, above.row, above.col);
-							TriggerFallAnimation(above, coords);
+							TriggerFallAnimation(above, coords, mState.GetTile(above).GetCandy());
 							mState.Swap(above, coords);
 							emptiesInCol[col]--;
 							break;
@@ -73,6 +73,7 @@ void CRefiller::RefillBoard()
 			}
 		}
 	}
+	FlushBlockAnimation();
 	// create new candies to fill empty tiles
 	for (int col = 0; col < mState.GetBoardSize(); col++)
 	{
@@ -82,14 +83,20 @@ void CRefiller::RefillBoard()
 			SBoardCoords coords = {0, col};
 			SBoardCoords destination = {empties - i, col};
 			mState.AddNewCandy(coords);
-			TriggerFallAnimation(coords, destination);
+			TriggerFallAnimation(coords, destination, mState.GetTile(coords).GetCandy());
 			mState.Swap(coords, destination);
 		}
 	}
+	FlushBlockAnimation();
 }
 
-void CRefiller::TriggerFallAnimation(SBoardCoords origin, SBoardCoords destination)
+void CRefiller::TriggerFallAnimation(SBoardCoords origin, SBoardCoords destination, CCandy* candy)
 {
-	CCandy* candy = mState.GetTile(origin).GetCandy();
-	mAnimationQueue.AddAnimation(std::make_unique<CMoveAnimation>(candy->GetPos(), mState.GetTilePos(destination), 700.f, candy));
+	mParallelAnims.emplace_back(std::make_unique<CMoveAnimation>(mState.GetTilePos(origin), mState.GetTilePos(destination), 700.f, candy));
+}
+
+void CRefiller::FlushBlockAnimation()
+{
+	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(std::move(mParallelAnims)));
+	mParallelAnims.clear();
 }

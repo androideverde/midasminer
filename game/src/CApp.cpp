@@ -161,7 +161,7 @@ void CApp::OnButtonUp(int x, int y)
 
 void CApp::OnLoop(float delta_time)
 {
-	mBoard.Update(delta_time);
+	mBoard.Update(delta_time*.1f);
 }
 
 void CApp::OnRender()
