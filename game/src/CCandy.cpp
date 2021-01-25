@@ -6,7 +6,7 @@ CCandy::CCandy(CandyType tileType)
 {
 }
 
-CCandy::CCandy(CandyType tileType, SDL_Point pos)
+CCandy::CCandy(CandyType tileType, SPixelCoords pos)
 	: mTileType(tileType)
 	, mPoint(pos)
 {
@@ -17,13 +17,13 @@ void CCandy::SetType(CandyType tileType)
 	mTileType = tileType;
 }
 
-void CCandy::SetPos(int x, int y)
+void CCandy::SetPos(float x, float y)
 {
 	mPoint.x = x;
 	mPoint.y = y;
 }
 
-void CCandy::SetPos(SDL_Point point)
+void CCandy::SetPos(SPixelCoords point)
 {
 	mPoint = point;
 }

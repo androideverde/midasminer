@@ -1,10 +1,10 @@
 #pragma once
 
 #include <SBoardCoords.h>
+#include <SPixelCoords.h>
 #include <CCandyGenerator.h>
 #include <CCandy.h>
 #include <CTile.h>
-#include <SDL.h>
 #include <vector>
 #include <string>
 #include <set>
@@ -23,15 +23,15 @@ public:
 	std::set<SBoardCoords> KeepCollectingNeighbours(const std::set<SBoardCoords>& list, const std::string& orientation, std::set<SBoardCoords>& result);
 	void Swap(SBoardCoords tileCoords_1, SBoardCoords tileCoords_2);
 	int GetBoardSize() const { return BOARD_SIZE; }
-	SDL_Point GetTilePos(int index) const;
-	SDL_Point GetTilePos(SBoardCoords coords) const;
+	SPixelCoords GetTilePos(int index) const;
+	SPixelCoords GetTilePos(SBoardCoords coords) const;
 	void AddNewCandy(SBoardCoords coords);
 private:
 	std::vector<std::unique_ptr<CCandy>> mCandies;
 	std::vector<CTile> mTiles;
 	const int BOARD_SIZE;
 	const int TILE_SIZE;
-	const SDL_Point BOARD_ORIGIN;
+	const SPixelCoords BOARD_ORIGIN;
 	std::unique_ptr<const CCandyGenerator> mCandyGenerator;
 	enum class EDirection {LEFT, RIGHT, UP, DOWN};
 	SBoardCoords GetCoordsFromIndex(int index) const;

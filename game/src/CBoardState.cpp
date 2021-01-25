@@ -19,7 +19,7 @@ namespace CBoardStateInternal {
 CBoardState::CBoardState(int size, int tileSize, int originX, int originY, std::unique_ptr<const CCandyGenerator> candyGenerator)
 	: BOARD_SIZE(size)
 	, TILE_SIZE(tileSize)
-	, BOARD_ORIGIN({originX, originY})
+	, BOARD_ORIGIN({static_cast<float>(originX), static_cast<float>(originY)})
 	, mCandyGenerator(std::move(candyGenerator))
 {
 	mCandies.clear();
@@ -31,14 +31,14 @@ CBoardState::CBoardState(int size, int tileSize, int originX, int originY, std::
 	SetupBoard(CBoardStateInternal::SampleBoard);
 }
 
-SDL_Point CBoardState::GetTilePos(int index) const
+SPixelCoords CBoardState::GetTilePos(int index) const
 {
 	return GetTilePos(GetCoordsFromIndex(index));
 }
 
-SDL_Point CBoardState::GetTilePos(SBoardCoords coords) const
+SPixelCoords CBoardState::GetTilePos(SBoardCoords coords) const
 {
-	SDL_Point point;
+	SPixelCoords point;
 	point.x = coords.col * TILE_SIZE + BOARD_ORIGIN.x;
 	point.y = coords.row * TILE_SIZE + BOARD_ORIGIN.y;
 	return point;
@@ -241,7 +241,7 @@ void CBoardState::AddNewCandy(SBoardCoords coords)
 {
 	CandyType newTile = mCandyGenerator->GenerateCandy();
 	// the newly created candy is placed in row -1
-	SDL_Point spawnPos = GetTilePos(coords);
+	SPixelCoords spawnPos = GetTilePos(coords);
 	spawnPos.y -= TILE_SIZE;
 	std::unique_ptr<CCandy> candy = std::make_unique<CCandy>(newTile, spawnPos);
 	GetTile(coords).SetCandy(candy.get());

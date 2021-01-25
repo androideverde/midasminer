@@ -2,18 +2,20 @@
 
 #include <CAnimation.h>
 
+#include <SPixelCoords.h>
+
 class CMoveAnimation
 	: public CAnimation
 {
 public:
-	CMoveAnimation(SDL_Point start, SDL_Point end, float speed, CCandy* candy);
+	CMoveAnimation(SPixelCoords start, SPixelCoords end, float speed, CCandy* candy);
 	void Update(float delta_time) override;
-	SDL_Point GetStart() const { return mPositionStart; }
-	SDL_Point GetEnd() const { return mPositionEnd; }
+	SPixelCoords GetStart() const { return mPositionStart; }
+	SPixelCoords GetEnd() const { return mPositionEnd; }
 private:
-	SDL_Point mPositionStart;
-	SDL_Point mPositionEnd;
+	SPixelCoords mPositionStart;
+	SPixelCoords mPositionEnd;
 	CCandy* mCandy;
-	int UpdatePos(float delta_time, int oldPos, float speed) const;
-	bool IsMoveComplete(int oldPos, int newPos, int endPos) const;
+	float UpdatePos(float delta_time, float oldPos, float speed) const;
+	bool IsMoveComplete(float oldPos, float newPos, float endPos) const;
 };

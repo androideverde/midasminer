@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-CMoveAnimation::CMoveAnimation(SDL_Point start, SDL_Point end, float speed, CCandy* candy)
+CMoveAnimation::CMoveAnimation(SPixelCoords start, SPixelCoords end, float speed, CCandy* candy)
 	: mPositionStart(start)
 	, mPositionEnd(end)
 	, mCandy(candy)
@@ -12,8 +12,8 @@ CMoveAnimation::CMoveAnimation(SDL_Point start, SDL_Point end, float speed, CCan
 
 void CMoveAnimation::Update(float delta_time)
 {
-	SDL_Point oldPos = mCandy->GetPos();
-	SDL_Point newPos;
+	SPixelCoords oldPos = mCandy->GetPos();
+	SPixelCoords newPos;
 	float deltaX = mPositionEnd.x - mPositionStart.x;
 	float deltaY = mPositionEnd.y - mPositionStart.y;
 	float speed;
@@ -34,7 +34,7 @@ void CMoveAnimation::Update(float delta_time)
 	if (mCompleted)
 	{
 		mCandy->SetPos(mPositionEnd);
-		printf("move anim done! (%d, %d) -> (%d, %d) %d\n", mPositionStart.x, mPositionStart.y, mPositionEnd.x, mPositionEnd.y, mCandy->GetType());
+		printf("move anim done! (%f, %f) -> (%f, %f) %d\n", mPositionStart.x, mPositionStart.y, mPositionEnd.x, mPositionEnd.y, mCandy->GetType());
 	}
 	else
 	{
@@ -42,13 +42,12 @@ void CMoveAnimation::Update(float delta_time)
 	}
 }
 
-int CMoveAnimation::UpdatePos(float delta_time, int oldPos, float speed) const
+float CMoveAnimation::UpdatePos(float delta_time, float oldPos, float speed) const
 {
-	float result = oldPos + speed * delta_time;
-	return result;
+	return oldPos + speed * delta_time;
 }
 
-bool CMoveAnimation::IsMoveComplete(int oldPos, int newPos, int endPos) const
+bool CMoveAnimation::IsMoveComplete(float oldPos, float newPos, float endPos) const
 {
 	if ((oldPos - endPos) * (newPos - endPos) <= 0)
 	{

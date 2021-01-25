@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL.h>
+#include <SPixelCoords.h>
 #include <string>
 
 enum class CandyType {
@@ -16,16 +16,16 @@ class CCandy
 {
 public:
 	CCandy(CandyType tileType);
-	CCandy(CandyType tileType, SDL_Point pos);
+	CCandy(CandyType tileType, SPixelCoords pos);
 	CandyType GetType() const { return mTileType; }
 	std::string GetName() const;
-	int GetX() const { return mPoint.x; }
-	int GetY() const { return mPoint.y; }
-	SDL_Point GetPos() const { return mPoint; }
+	float GetX() const { return mPoint.x; }
+	float GetY() const { return mPoint.y; }
+	SPixelCoords GetPos() const { return mPoint; }
 	void SetType(CandyType tileType);
-	void SetPos(int x, int y);
-	void SetPos(SDL_Point point);
+	void SetPos(float x, float y);
+	void SetPos(SPixelCoords point);
 private:
-	SDL_Point mPoint;
+	SPixelCoords mPoint;
 	CandyType mTileType;
 };
