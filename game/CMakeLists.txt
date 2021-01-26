@@ -42,6 +42,7 @@ add_executable(${PROJECT_NAME}_tests)
 add_subdirectory(dependencies/googletest-1.10.x)
 target_link_libraries(${PROJECT_NAME}_tests PUBLIC gtest)
 target_link_libraries(${PROJECT_NAME}_tests PUBLIC /Library/Frameworks/SDL2.framework/SDL2)
+target_link_libraries(${PROJECT_NAME}_tests PUBLIC /Library/Frameworks/SDL2_ttf.framework/SDL2_ttf)
 target_link_libraries(${PROJECT_NAME}_tests PUBLIC /Library/Frameworks/SDL2_image.framework/SDL2_image)
 # remove src/main.cpp from list of sources to compile in the tests target
 list(REMOVE_ITEM project_files /Users/Jordi.Bernabeu/personal/c++/midasminer/game/src/main.cpp)
