@@ -1,7 +1,9 @@
 #include <CRefiller.h>
 
 #include <CMoveAnimation.h>
+#include <CDelayAnimation.h>
 #include <CParallelAnimation.h>
+#include <CSequentialAnimation.h>
 #include <CTile.h>
 
 CRefiller::CRefiller(CBoardState& state, CAnimationSystem& animationQueue)
@@ -63,7 +65,7 @@ void CRefiller::RefillBoard()
 						{
 							above = {coords.row - i, col};
 							printf("Will fill (%d, %d) with (%d, %d)\n", coords.row, coords.col, above.row, above.col);
-							TriggerFallAnimation(above, coords, mState.GetTile(above).GetCandy());
+							TriggerFallAnimation(above, coords, mState.GetTile(above).GetCandy(), 0);
 							mState.Swap(above, coords);
 							emptiesInCol[col]--;
 							break;
@@ -83,16 +85,27 @@ void CRefiller::RefillBoard()
 			SBoardCoords coords = {0, col};
 			SBoardCoords destination = {empties - i, col};
 			mState.AddNewCandy(coords);
-			TriggerFallAnimation(coords, destination, mState.GetTile(coords).GetCandy());
+			float delay = mState.GetTileSize() / 700.f * i;
+			TriggerFallAnimation(coords, destination, mState.GetTile(coords).GetCandy(), delay);
 			mState.Swap(coords, destination);
 		}
 	}
 	FlushBlockAnimation();
 }
 
-void CRefiller::TriggerFallAnimation(SBoardCoords origin, SBoardCoords destination, CCandy* candy)
+void CRefiller::TriggerFallAnimation(SBoardCoords origin, SBoardCoords destination, CCandy* candy, float delay)
 {
-	mParallelAnims.emplace_back(std::make_unique<CMoveAnimation>(mState.GetTilePos(origin), mState.GetTilePos(destination), 700.f, candy));
+	if (delay != 0)
+	{
+		CSequentialAnimation sequentialAnims;
+		sequentialAnims.AddAnimation(std::make_unique<CDelayAnimation>(0.f, delay));
+		sequentialAnims.AddAnimation(std::make_unique<CMoveAnimation>(mState.GetTile(origin).GetCandy()->GetPos(), mState.GetTilePos(destination), 700.f, candy));
+		mParallelAnims.emplace_back(std::make_unique<CSequentialAnimation>(std::move(sequentialAnims)));
+	}
+	else
+	{
+		mParallelAnims.emplace_back(std::make_unique<CMoveAnimation>(mState.GetTile(origin).GetCandy()->GetPos(), mState.GetTilePos(destination), 700.f, candy));
+	}
 }
 
 void CRefiller::FlushBlockAnimation()
