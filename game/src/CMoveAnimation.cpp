@@ -1,6 +1,8 @@
 #include <CMoveAnimation.h>
 
 #include <cassert>
+#include <cmath>
+#include <limits>
 
 CMoveAnimation::CMoveAnimation(SPixelCoords start, SPixelCoords end, float speed, CCandy* candy)
 	: mPositionStart(start)
@@ -17,7 +19,8 @@ void CMoveAnimation::Update(float delta_time)
 	float deltaX = mPositionEnd.x - mPositionStart.x;
 	float deltaY = mPositionEnd.y - mPositionStart.y;
 	float speed;
-	if (deltaX == 0)
+	float epsilon = std::numeric_limits<float>::epsilon();
+	if (std::abs(deltaX) < epsilon)
 	{
 		newPos.x = oldPos.x;
 		speed = deltaY > 0 ? mSpeed : -mSpeed;
@@ -49,7 +52,7 @@ float CMoveAnimation::UpdatePos(float delta_time, float oldPos, float speed) con
 
 bool CMoveAnimation::IsMoveComplete(float oldPos, float newPos, float endPos) const
 {
-	if ((oldPos - endPos) * (newPos - endPos) <= 0)
+	if ((oldPos - endPos) * (newPos - endPos) <= 0.f)
 	{
 		return true;
 	}
