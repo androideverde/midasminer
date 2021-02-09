@@ -28,11 +28,12 @@ void CBoard::LoadResources(SDL_Renderer* renderer)
 	mFont = TTF_OpenFont("../assets/Impact.ttf", 28);
 }
 
-CBoard::CBoard()
+CBoard::CBoard(CScoringSystem& scorer)
 	: mBoardState(BOARD_SIZE, TILE_SIZE, ORIGIN_X, ORIGIN_Y, std::make_unique<const CCandyGenerator>())
 	, mFont(nullptr)
 	, mAnimationQueue()
-	, mMatcher(mBoardState, mAnimationQueue)
+	, mScoringSystem(scorer)
+	, mMatcher(mBoardState, mAnimationQueue, mScoringSystem)
 	, mSwapper(mBoardState, mAnimationQueue, mMatcher)
 	, mRefiller(mBoardState, mAnimationQueue)
 	, mSwappedTileCoords_1()
@@ -114,7 +115,7 @@ SBoardCoords CBoard::GetBoardTileCoords(int x, int y) const
 void CBoard::Render(SDL_Renderer* renderer) const
 {
 	RenderTime(renderer, 0);
-	RenderScore(renderer, 0);
+	RenderScore(renderer, mScoringSystem.GetScore());
 	
 	SDL_Rect rect = {0, 0, 0, 0};
 

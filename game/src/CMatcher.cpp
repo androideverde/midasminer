@@ -4,9 +4,10 @@
 #include <CParallelAnimation.h>
 #include <CTile.h>
 
-CMatcher::CMatcher(CBoardState& state, CAnimationSystem& animationQueue)
+CMatcher::CMatcher(CBoardState& state, CAnimationSystem& animationQueue, CScoringSystem& scorer)
 	: mState(state)
 	, mAnimationQueue(animationQueue)
+	, mScorer(scorer)
 {
 }
 
@@ -23,6 +24,7 @@ std::set<SBoardCoords> CMatcher::DoMatchInTile(SBoardCoords coords)
 		parallelAnims.emplace_back(std::make_unique<CDestroyAnimation>(10.f, candy));
 	}
 	mAnimationQueue.AddAnimation(std::make_unique<CParallelAnimation>(std::move(parallelAnims)));
+	mScorer.AddToScore(matches.size());
 	return matches;
 }
 
