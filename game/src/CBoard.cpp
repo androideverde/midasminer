@@ -85,9 +85,11 @@ void CBoard::Update(float delta_time)
 		else if (mMatcher.IsMatchPending())
 		{
 			mMatcher.DoMatch();
+			mScoringSystem.IncreaseMultiplier(1);
 		}
 		else if (IsSwapPending())
 		{
+			mScoringSystem.ResetMultiplier();
 			mSwapper.DoSwap(mSwappedTileCoords_1, mSwappedTileCoords_2);
 			mSwappedTileCoords_1 = mSwappedTileCoords_2 = {-100, -100};
 		}
