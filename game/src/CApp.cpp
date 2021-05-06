@@ -15,6 +15,7 @@ CApp::CApp()
 	, mBoard(mScoringSystem)
 	, mTileClickedCoords()
 	, mDragging(false)
+	, mInputHandler([this](){OnExit();})
 {
 }
 
@@ -103,61 +104,12 @@ bool CApp::LoadResources()
 
 void CApp::OnEvent(SDL_Event* event)
 {
-	CEvent::OnEvent(event);
+	mInputHandler.OnEvent(event);
 }
 
 void CApp::OnExit()
 {
 	mRunning = false;
-}
-
-void CApp::OnMouseMove(int x, int y, int delta_x, int delta_y, bool l_button, bool r_button, bool m_button)
-{
-	if (mDragging)
-	{
-		SBoardCoords currentTileCoords = mBoard.GetBoardTileCoords(x, y);
-		if (mTileClickedCoords.row != -100 && currentTileCoords.row != -100)
-		{
-			if (!(mTileClickedCoords == currentTileCoords))
-			{
-				mBoard.OnDrag(mTileClickedCoords, currentTileCoords);
-				mDragging = false;
-			}
-		}
-	}
-}
-
-void CApp::OnLButtonDown(int x, int y)
-{
-	mTileClickedCoords = mBoard.GetBoardTileCoords(x, y);
-	if (mTileClickedCoords.row != -100)
-	{
-		mDragging = true;
-	}
-}
-
-void CApp::OnRButtonDown(int x, int y)
-{
-}
-
-void CApp::OnMButtonDown(int x, int y)
-{
-}
-
-void CApp::OnButtonUp(int x, int y)
-{
-	if (mDragging)
-	{
-		SBoardCoords currentTileCoords = mBoard.GetBoardTileCoords(x, y);
-		if (mTileClickedCoords.row != -100 && currentTileCoords.row != -100)
-		{
-			if (mTileClickedCoords == currentTileCoords)
-			{
-				mBoard.OnClick(currentTileCoords);
-				mDragging = false;
-			}
-		}
-	}
 }
 
 void CApp::OnLoop(float delta_time)
