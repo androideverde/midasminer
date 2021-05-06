@@ -75,7 +75,8 @@ TEST(board, no_match_available)
 	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
 	board.SetupBoard(testBoard);
 	CAnimationSystem animSys; // TODO: can be mocked
-	CMatcher matcher(board, animSys);
+	CScoringSystem scoringSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys, scoringSys);
 	EXPECT_FALSE(matcher.IsMatchPending());
 }
 
@@ -94,7 +95,8 @@ TEST(board, row_match_triggered)
 	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
 	board.SetupBoard(testBoard);
 	CAnimationSystem animSys; // TODO: can be mocked
-	CMatcher matcher(board, animSys);
+	CScoringSystem scoringSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys, scoringSys);
 	EXPECT_TRUE(matcher.IsMatchPending());
 	EXPECT_FALSE(matcher.IsMatchInTile({0, 0}));
 	EXPECT_TRUE(matcher.IsMatchInTile({3, 3}));
@@ -121,7 +123,8 @@ TEST(board, col_match_triggered)
 	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
 	board.SetupBoard(testBoard);
 	CAnimationSystem animSys; // TODO: can be mocked
-	CMatcher matcher(board, animSys);
+	CScoringSystem scoringSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys, scoringSys);
 	EXPECT_TRUE(matcher.IsMatchPending());
 	EXPECT_TRUE(matcher.IsMatchInTile({0, 3}));
 	EXPECT_TRUE(matcher.IsMatchInTile({1, 3}));
@@ -147,7 +150,8 @@ TEST(board, t_match_triggered_on_row)
 	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
 	board.SetupBoard(testBoard);
 	CAnimationSystem animSys; // TODO: can be mocked
-	CMatcher matcher(board, animSys);
+	CScoringSystem scoringSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys, scoringSys);
 	EXPECT_TRUE(matcher.IsMatchPending());
 	EXPECT_TRUE(matcher.IsMatchInTile({0, 2}));
 	EXPECT_TRUE(matcher.IsMatchInTile({0, 3}));
@@ -177,7 +181,8 @@ TEST(board, t_match_triggered_on_col)
 	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
 	board.SetupBoard(testBoard);
 	CAnimationSystem animSys; // TODO: can be mocked
-	CMatcher matcher(board, animSys);
+	CScoringSystem scoringSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys, scoringSys);
 	EXPECT_TRUE(matcher.IsMatchPending());
 	EXPECT_TRUE(matcher.IsMatchInTile({0, 2}));
 	EXPECT_TRUE(matcher.IsMatchInTile({0, 3}));
@@ -207,7 +212,8 @@ TEST(board, t_match_triggered_on_row_full_board)
 	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
 	board.SetupBoard(testBoard);
 	CAnimationSystem animSys; // TODO: can be mocked
-	CMatcher matcher(board, animSys);
+	CScoringSystem scoringSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys, scoringSys);
 	EXPECT_TRUE(matcher.IsMatchPending());
 	EXPECT_TRUE(matcher.IsMatchInTile({0, 2}));
 	EXPECT_TRUE(matcher.IsMatchInTile({0, 3}));
@@ -237,7 +243,8 @@ TEST(board, t_match_triggered_on_col_full_board)
 	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
 	board.SetupBoard(testBoard);
 	CAnimationSystem animSys; // TODO: can be mocked
-	CMatcher matcher(board, animSys);
+	CScoringSystem scoringSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys, scoringSys);
 	EXPECT_TRUE(matcher.IsMatchPending());
 	EXPECT_TRUE(matcher.IsMatchInTile({0, 2}));
 	EXPECT_TRUE(matcher.IsMatchInTile({0, 3}));
@@ -267,7 +274,8 @@ TEST(board, row_match_with_neighbour)
 	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
 	board.SetupBoard(testBoard);
 	CAnimationSystem animSys; // TODO: can be mocked
-	CMatcher matcher(board, animSys);
+	CScoringSystem scoringSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys, scoringSys);
 	EXPECT_TRUE(matcher.IsMatchPending());
 	EXPECT_TRUE(matcher.IsMatchInTile({0, 2}));
 	EXPECT_TRUE(matcher.IsMatchInTile({0, 3}));
@@ -295,7 +303,8 @@ TEST(board, col_match_with_neighbour)
 	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>()); // TODO: candyGen can be mocked
 	board.SetupBoard(testBoard);
 	CAnimationSystem animSys; // TODO: can be mocked
-	CMatcher matcher(board, animSys);
+	CScoringSystem scoringSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys, scoringSys);
 	EXPECT_TRUE(matcher.IsMatchPending());
 	EXPECT_TRUE(matcher.IsMatchInTile({2, 4}));
 	EXPECT_TRUE(matcher.IsMatchInTile({3, 4}));
@@ -326,7 +335,8 @@ TEST(board, extreme_match)
 	CBoardState board(8, 43, 0, 0, std::make_unique<CCandyGenerator>());
 	board.SetupBoard(testBoard);
 	CAnimationSystem animSys; // TODO: can be mocked
-	CMatcher matcher(board, animSys);
+	CScoringSystem scoringSys; // TODO: can be mocked
+	CMatcher matcher(board, animSys, scoringSys);
 	matcher.DoMatch();
 	EXPECT_EQ(board.GetTile({0, 0}).GetCandy(), nullptr);
 	EXPECT_EQ(board.GetTile({0, 1}).GetCandy(), nullptr);
